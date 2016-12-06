@@ -6,13 +6,15 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 
+import edu.calpoly.idulkin.podcrust.rest.SearchShowResult.SearchShowResult;
+import trikita.anvil.BaseDSL;
 import trikita.anvil.RenderableView;
 
 import static trikita.anvil.BaseDSL.MATCH;
-import static trikita.anvil.BaseDSL.dip;
-import static trikita.anvil.BaseDSL.padding;
+import static trikita.anvil.BaseDSL.onTextChanged;
 import static trikita.anvil.BaseDSL.size;
 import static trikita.anvil.DSL.adapter;
+import static trikita.anvil.DSL.editText;
 import static trikita.anvil.DSL.itemsCanFocus;
 import static trikita.anvil.DSL.linearLayout;
 import static trikita.anvil.DSL.listView;
@@ -26,33 +28,53 @@ import static trikita.anvil.DSL.orientation;
 public class SearchListView extends RenderableView {
 
     private final static String TAG = "SearchListView";
-    private final ShowAdapter showAdapter;
+    private final SearchedShowAdapter searchedShowAdapter;
+    private final CharSequenceConsumer onTextChanged;
+    private final SearchListView thiz;
 
-    public SearchListView(Context c) {
+    public interface CharSequenceConsumer {
+        void cb(CharSequence s);
+    }
+
+    public SearchListView(Context c, SearchShowResult searchShowResult, CharSequenceConsumer onTextChanged) {
         super(c);
-        showAdapter = new ShowAdapter();
+        searchedShowAdapter = new SearchedShowAdapter(searchShowResult);
+        this.onTextChanged = onTextChanged;
+        thiz = this;
+    }
+
+    public void notifyDataSetChanged() {
+        this.searchedShowAdapter.notifyDataSetChanged();
     }
 
     AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
         public void onItemClick(AdapterView parent, View v, int pos, long id) {
-            Log.d(TAG, "item clicked: " + showAdapter.getItem(pos).title);
+            Log.d(TAG, "item clicked: " + searchedShowAdapter.getItem(pos).getTitle());
         }
     };
 
     @Override
     public void view() {
-        showAdapter.notifyDataSetChanged();
+        searchedShowAdapter.notifyDataSetChanged();
 
         linearLayout(() -> {
             size(MATCH, MATCH);
-            padding(dip(8));
             orientation(LinearLayout.VERTICAL);
+
+            editText(() -> {
+                onTextChanged(new BaseDSL.SimpleTextWatcher() {
+                    @Override
+                    public void onTextChanged(CharSequence s) {
+                        thiz.onTextChanged.cb(s);
+                    }
+                });
+            });
 
             listView(() -> {
                 size(MATCH, MATCH);
                 itemsCanFocus(true);
                 onItemClick(onItemClickListener);
-                adapter(showAdapter);
+                adapter(searchedShowAdapter);
             });
         });
     }
