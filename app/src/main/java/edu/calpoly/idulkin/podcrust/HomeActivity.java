@@ -1,9 +1,17 @@
 package edu.calpoly.idulkin.podcrust;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
@@ -21,10 +29,34 @@ import edu.calpoly.idulkin.podcrust.searchedList.SearchListActivity;
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private MediaPlayerService mediaService;
+    private boolean bound = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        //Bind to the media player service
+        Intent intent = new Intent(this, MediaPlayerService.class);
+        startService(intent);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        bound = true;
+
         createDrawer();
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Unbind from the service
+        if (bound) {
+            unbindService(mConnection);
+            bound = false;
+        }
     }
 
     protected void createDrawer() {
@@ -32,13 +64,50 @@ public class HomeActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        switch(mediaService.getState()){
+//            case STOPPED:
+//                //Stopped icon
+//                break;
+//            case PAUSED:
+//                fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+//                        R.drawable.ic_play_button));
+//                break;
+//            case PLAYING:
+//                fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+//                        R.mipmap.ic_pause_button));
+//                break;
+//        }
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                if(bound) {
+                    Log.e("Home Activity FAB click", "MP State:" + mediaService.getState());
+
+                    switch (mediaService.getState()) {
+                        case STOPPED:
+                            Snackbar.make(view, "Choose an episode from Search", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
+
+                            break;
+                        case PAUSED:
+                            mediaService.start();
+
+                            fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                                    R.mipmap.ic_pause_button));
+                            break;
+                        case PLAYING:
+                            mediaService.pause();
+
+                            fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                                    R.drawable.ic_play_button));
+                            break;
+                    }
+                }
             }
+
         });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -117,4 +186,22 @@ public class HomeActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            MediaPlayerService.LocalBinder binder = (MediaPlayerService.LocalBinder) service;
+            mediaService = binder.getService();
+            bound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            bound = false;
+        }
+    };
 }

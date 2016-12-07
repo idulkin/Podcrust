@@ -34,6 +34,7 @@ public class PlayPodcastActivity extends AppCompatActivity {
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.playback_bar);
         setSupportActionBar(myToolbar);
+
     }
 
     @Override
@@ -73,6 +74,8 @@ public class PlayPodcastActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.bottom_bar_menu, menu);
 
+
+
         return true;
     }
 
@@ -109,6 +112,8 @@ public class PlayPodcastActivity extends AppCompatActivity {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             MediaPlayerService.LocalBinder binder = (MediaPlayerService.LocalBinder) service;
             mediaService = binder.getService();
+
+            mediaService.setSource("http://soundbible.com/grab.php?id=1851&type=mp3");
             bound = true;
         }
 
