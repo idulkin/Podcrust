@@ -1,11 +1,13 @@
 package edu.calpoly.idulkin.podcrust.searchedList;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 
+import edu.calpoly.idulkin.podcrust.EpisodeListActivity;
 import edu.calpoly.idulkin.podcrust.rest.SearchShowResult.SearchShowResult;
 import trikita.anvil.BaseDSL;
 import trikita.anvil.RenderableView;
@@ -49,7 +51,11 @@ public class SearchListView extends RenderableView {
 
     AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
         public void onItemClick(AdapterView parent, View v, int pos, long id) {
-            Log.d(TAG, "item clicked: " + searchedShowAdapter.getItem(pos).getTitle());
+            Log.d(TAG, "item clicked: " + searchedShowAdapter.getItem(pos).getTitle() + "item id " + searchedShowAdapter.getItemId(pos));
+            Context context = thiz.getContext();
+            Intent intent = new Intent(context, EpisodeListActivity.class);
+            intent.putExtra("SHOWID", searchedShowAdapter.getItemId(pos));
+            thiz.getContext().startActivity(intent);
         }
     };
 
