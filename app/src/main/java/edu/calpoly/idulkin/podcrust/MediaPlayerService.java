@@ -40,7 +40,7 @@ public class MediaPlayerService extends Service
     }
 
     //Tracks the state of the MediaPlayer
-    public static enum MP_STATE {
+    public enum MP_STATE {
         PLAYING, PAUSED, STOPPED
     }
     private MP_STATE state;
@@ -124,20 +124,22 @@ public class MediaPlayerService extends Service
 
     public void start(){
         mediaPlayer.start();
-        Log.e("Media Player Service", "Start playback");
         state = MP_STATE.PLAYING;
+        Log.e("Media Player Service", "State: "+ getState());
     }
 
     public void pause(){
         mediaPlayer.pause();
-        Log.e("Media Player Service", "Pause playback");
         state = MP_STATE.PAUSED;
+
+        Log.e("Media Player Service", "State: "+ getState());
     }
 
     public void stop(){
         mediaPlayer.stop();
-        Log.e("Media Player Service", "Stop playback");
         state = MP_STATE.STOPPED;
+
+        Log.e("Media Player Service", "State: "+ getState());
     }
 
     public void setSource(String source){
@@ -165,13 +167,13 @@ public class MediaPlayerService extends Service
             case AudioManager.AUDIOFOCUS_GAIN:
                 // resume playback
                 if (mediaPlayer == null) initMediaPlayer();
-                else if (state == MP_STATE.STOPPED) mediaPlayer.start();
+                else if (state == MP_STATE.STOPPED) start();
                 mediaPlayer.setVolume(1.0f, 1.0f);
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS:
                 // Lost focus for an unbounded amount of time: stop playback and release media player
-                if (state == MP_STATE.PLAYING) mediaPlayer.stop();
+                if (state == MP_STATE.PLAYING) stop();
                 mediaPlayer.release();
                 mediaPlayer = null;
                 break;
@@ -180,7 +182,7 @@ public class MediaPlayerService extends Service
                 // Lost focus for a short time, but we have to stop
                 // playback. We don't release the media player because playback
                 // is likely to resume
-                if (state == MP_STATE.PLAYING) //mediaPlayer.pause();
+                if (state == MP_STATE.PLAYING) pause();
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
@@ -195,6 +197,7 @@ public class MediaPlayerService extends Service
     public void onDestroy(){
         super.onDestroy();
 
+        stop();
         if(mediaPlayer == null) mediaPlayer.release();
 
         wifiLock.release();

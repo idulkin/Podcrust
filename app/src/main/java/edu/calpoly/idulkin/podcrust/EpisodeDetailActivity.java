@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
@@ -12,7 +13,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -36,9 +40,6 @@ public class EpisodeDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_episode_detail);
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
-//        setSupportActionBar(toolbar);
-
         Bundle bundle = getIntent().getExtras();
 
         title = bundle.getString("TITLE");
@@ -47,6 +48,8 @@ public class EpisodeDetailActivity extends AppCompatActivity {
         img = bundle.getString("IMAGE");
         Log.d(TAG, "onCreate: " + title + mp3 + description + img);
 
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.detail_toolbar);
+        setSupportActionBar(myToolbar);
 
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
@@ -85,27 +88,62 @@ public class EpisodeDetailActivity extends AppCompatActivity {
             fragmentTransaction.commit();
         }
 
-        //Bind to the media player service
-        Intent intent = new Intent(this, MediaPlayerService.class);
-//        intent.putExtra("MP3", mp3);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        bound = true;
-
         //Floating action button plays the podcast
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(bound) {
+                    Log.e("FAB click", "MP State:" + mediaService.getState());
 
-                if(!(mediaService.getState() == MediaPlayerService.MP_STATE.STOPPED)){
-                    mediaService.stop();
+                    switch (mediaService.getState()) {
+                        case STOPPED:
+                            mediaService.setSource(mp3);
+                            mediaService.start();
+
+                            fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                                    R.mipmap.ic_pause_button));
+                            break;
+                        case PAUSED:
+                            mediaService.start();
+
+                            fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                                    R.mipmap.ic_pause_button));
+                            break;
+                        case PLAYING:
+                            mediaService.pause();
+
+                            fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                                    R.drawable.ic_play_button));
+                            break;
+
+
+                    }
                 }
-
-                mediaService.setSource(mp3);
-                mediaService.start();
             }
         });
 
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+
+        //Bind to the media player service
+        Intent intent = new Intent(this, MediaPlayerService.class);
+//        intent.putExtra("MP3", mp3);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        bound = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Unbind from the service
+        if (bound) {
+            unbindService(mConnection);
+            bound = false;
+        }
     }
 
     @Override
@@ -122,13 +160,6 @@ public class EpisodeDetailActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onDestroy(){
-        super.onDestroy();
-        if(bound)
-            unbindService(mConnection);
     }
 
     /** Defines callbacks for service binding, passed to bindService() */
@@ -148,4 +179,6 @@ public class EpisodeDetailActivity extends AppCompatActivity {
             bound = false;
         }
     };
+
+
 }
