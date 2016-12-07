@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 
 import audiosearch.Audiosearch;
 import audiosearch.exception.CredentialsNotFoundException;
@@ -60,12 +61,12 @@ public class QueryExecutor {
         return t;
     }
 
-    final String callbackUrl = "urn:ietf:wg:oauth:2.0:oob";
-    final String applicationId = "c2b235f2620e362157a40aec609e737fe5a2547784933e00201ff90358e092c5";
-    final String secret = "bee75fbb20ce6b45b64113b44208d12aeca02121fee8ea40f1bd9f44b491ba1c";
-    final String authorizationCode = "ad2311b2860d224f89c32b7dfd4cb99550ba358aef412fae9ad11b52957a8930";
+    static final String callbackUrl = "urn:ietf:wg:oauth:2.0:oob";
+    static final String applicationId = "c2b235f2620e362157a40aec609e737fe5a2547784933e00201ff90358e092c5";
+    static final String secret = "bee75fbb20ce6b45b64113b44208d12aeca02121fee8ea40f1bd9f44b491ba1c";
+    static final String authorizationCode = "ad2311b2860d224f89c32b7dfd4cb99550ba358aef412fae9ad11b52957a8930";
 
-    Audiosearch createClient() throws CredentialsNotFoundException, UnsupportedEncodingException {
+    public static Audiosearch createClient() throws CredentialsNotFoundException, UnsupportedEncodingException {
 
         return new Audiosearch()
                 .setApplicationId(applicationId)
@@ -89,7 +90,7 @@ public class QueryExecutor {
         }*/
     }
 
-    SearchShowResult getSearchShowResult(Audiosearch client, String query) throws IOException {
+    public static SearchShowResult getSearchShowResult(Audiosearch client, String query) throws IOException {
         return client.searchShows(query).execute().body();
 
         /*try {
@@ -105,7 +106,7 @@ public class QueryExecutor {
         }*/
     }
 
-    Show getShow(Audiosearch client, long showId) throws IOException {
+    public static Show getShow(Audiosearch client, long showId) throws IOException {
         return client.getShow(showId).execute().body();
 
         /*try {
@@ -121,7 +122,7 @@ public class QueryExecutor {
         }*/
     }
 
-    Episode getEpisode(Audiosearch client, long episodeId) throws IOException {
+    public static Episode getEpisode(Audiosearch client, long episodeId) throws IOException {
         return client.getEpisode(episodeId).execute().body();
 
         /*try {
@@ -137,5 +138,12 @@ public class QueryExecutor {
         }*/
     }
 
-
+    public ShowWithEpisodes getShowWithEpisodes(Audiosearch client, long showId) throws CredentialsNotFoundException, IOException {
+        final Show show = QueryExecutor.getShow(client, showId);
+        final ArrayList<Episode> episodes = new ArrayList<Episode>();
+        for (Integer episodeId : show.getEpisodeIds()) {
+            episodes.add(QueryExecutor.getEpisode(client, episodeId));
+        }
+        return new ShowWithEpisodes(show, episodes);
+    }
 }
