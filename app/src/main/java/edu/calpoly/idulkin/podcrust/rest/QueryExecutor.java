@@ -138,12 +138,32 @@ public class QueryExecutor {
         }*/
     }
 
-    public ShowWithEpisodes getShowWithEpisodes(Audiosearch client, long showId) throws CredentialsNotFoundException, IOException {
+    public static ShowWithEpisodes getShowWithEpisodes(Audiosearch client, long showId) throws CredentialsNotFoundException, IOException {
         final Show show = QueryExecutor.getShow(client, showId);
         final ArrayList<Episode> episodes = new ArrayList<Episode>();
         for (Integer episodeId : show.getEpisodeIds()) {
             episodes.add(QueryExecutor.getEpisode(client, episodeId));
         }
         return new ShowWithEpisodes(show, episodes);
+    }
+
+    public interface ShowWithEpisodesConsumer {
+        void cb(ShowWithEpisodes showWithEpisodes);
+    }
+
+    public static void getShowWithEpisodesAsync(Audiosearch client, long showId, ShowWithEpisodesConsumer onNewEpisode) throws IOException {
+        new Thread(() -> {
+            try {
+                final Show show = QueryExecutor.getShow(client, showId);
+                final ArrayList<Episode> episodes = new ArrayList<Episode>();
+                for (Integer episodeId : show.getEpisodeIds()) {
+                    episodes.add(QueryExecutor.getEpisode(client, episodeId));
+                    onNewEpisode.cb(new ShowWithEpisodes(show, episodes));
+                }
+            }
+            catch (Exception e) {
+                Log.d("QueryExecutor", "couldn't getShowWithEpisodes");
+            }
+        }).start();
     }
 }

@@ -19,7 +19,6 @@ import java.util.Arrays;
 
 import audiosearch.Audiosearch;
 import edu.calpoly.idulkin.podcrust.dummy.Show;
-import edu.calpoly.idulkin.podcrust.rest.SearchShowResult.SearchShowResult;
 
 /**
  * An activity representing a list of Episodes. This activity
@@ -37,11 +36,9 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
      */
     private boolean mTwoPane;
     private static final String TAG = "EpisodeListActivity";
-    public static ArrayList<SearchAudio> searchAudioList;
-//    private SimpleItemRecyclerViewAdapter episodeAdapter;
     // temp data
-    private static final Show show = new Show();
-    private static final Show.dummyEpisode[] list = show.getList();
+    private static Show show;
+    private static Show.dummyEpisode[] list;
     private static SimpleItemRecyclerViewAdapter mAdapter;
 
     @Override
@@ -53,7 +50,9 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
-        getQueryResults();
+        Intent intent = getIntent();
+        long show_id = intent.getLongExtra("SHOWID", -1);
+        getQueryResults(show_id);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.episode_list);
         assert recyclerView != null;
@@ -83,27 +82,44 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
         recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(new ArrayList<Show.dummyEpisode>(Arrays.asList(list))));
     }
 
-    private void getQueryResults () {
+    private void getQueryResults (long show_id) {
         final String callbackUrl = "urn:ietf:wg:oauth:2.0:oob";
         final String applicationId = "c2b235f2620e362157a40aec609e737fe5a2547784933e00201ff90358e092c5";
         final String secret = "bee75fbb20ce6b45b64113b44208d12aeca02121fee8ea40f1bd9f44b491ba1c";
         final String authorizationCode = "ad2311b2860d224f89c32b7dfd4cb99550ba358aef412fae9ad11b52957a8930";
 
-        new Thread(() -> {
+/*        new Thread(() -> {
             try {
                 Audiosearch client = new Audiosearch()
                         .setApplicationId(applicationId)
                         .setSecret(secret)
                         .build();
-
-                SearchShowResult searchShowResult = client.searchShows("basketball").execute().body();
-                Log.d("searchresult", searchShowResult.toString());
-                Log.d("searchresult", searchShowResult.getResults().get(0).getTitle());
+                show = new Show(client, show_id);
             } catch (Exception e) {
                 Log.d("searchlist", "failure to search");
                 Log.d("searchlist", e.toString());
             }
-        }).start();
+        }).start(); */
+        Thread t = new Thread(() -> {
+            try {
+                Audiosearch client = new Audiosearch()
+                        .setApplicationId(applicationId)
+                        .setSecret(secret)
+                        .build();
+                show = new Show(client, show_id);
+            } catch (Exception e) {
+                Log.d("searchlist", "failure to search");
+                Log.d("searchlist", e.toString());
+            }
+        });
+        t.start();
+        // t.join() is to wait for thread to finish
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        list = show.getList();
     }
 
     public class SimpleItemRecyclerViewAdapter
