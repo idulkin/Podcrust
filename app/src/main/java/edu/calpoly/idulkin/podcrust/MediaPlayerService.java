@@ -84,15 +84,15 @@ public class MediaPlayerService extends Service
     }
 
     public IBinder onBind(Intent intent) {
-//        String mp3 = intent.getStringExtra("MP3");
-//        Log.d(TAG, "onBind");
-//        if (mp3 != null) {
-//            Log.d(TAG, "onBind: mp3 is not null" + mp3);
-//            url = mp3;
-//        }
-
         return mBinder;
     }
+
+//    @Override
+//    public int onStartCommand(Intent intent, int flags, int startId) {
+//        // We want this service to continue running until it is explicitly
+//        // stopped, so return sticky.
+//        return START_STICKY;
+//    }
 
     /** Called when MediaPlayer is ready */
     public void onPrepared(MediaPlayer player) {
@@ -115,29 +115,33 @@ public class MediaPlayerService extends Service
         mediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
 
 //        mediaPlayer.stop();
-        state = MP_STATE.STOPPED;
+        setState(MP_STATE.STOPPED);
     }
 
     public MP_STATE getState(){
         return state;
     }
 
+    public void setState(MP_STATE state){
+        this.state = state;
+    }
+
     public void start(){
         mediaPlayer.start();
-        state = MP_STATE.PLAYING;
+        setState(MP_STATE.PLAYING);
         Log.e("Media Player Service", "State: "+ getState());
     }
 
     public void pause(){
         mediaPlayer.pause();
-        state = MP_STATE.PAUSED;
+        setState(MP_STATE.PAUSED);
 
         Log.e("Media Player Service", "State: "+ getState());
     }
 
     public void stop(){
         mediaPlayer.stop();
-        state = MP_STATE.STOPPED;
+        setState(MP_STATE.STOPPED);
 
         Log.e("Media Player Service", "State: "+ getState());
     }
@@ -157,7 +161,7 @@ public class MediaPlayerService extends Service
     public boolean onError(MediaPlayer mp, int what, int extra) {
         // ... react appropriately ...
         // The MediaPlayer has moved to the Error state, must be reset!
-        initMediaPlayer();
+//        initMediaPlayer();
 
         return true;
     }
@@ -203,6 +207,7 @@ public class MediaPlayerService extends Service
         wifiLock.release();
 
         stopForeground(true);
+        stopSelf();
     }
 }
 

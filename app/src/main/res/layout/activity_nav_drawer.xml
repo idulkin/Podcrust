@@ -22,4 +22,14 @@
         app:headerLayout="@layout/nav_header_nav_drawer"
         app:menu="@menu/activity_nav_drawer_drawer" />
 
+    <!--<FrameLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent">-->
+        <!--<android.support.v7.widget.RecyclerView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:id="@+id/show_list">-->
+        <!--</android.support.v7.widget.RecyclerView>-->
+    <!--</FrameLayout>-->
+
 </android.support.v4.widget.DrawerLayout>

@@ -116,8 +116,6 @@ public class EpisodeDetailActivity extends AppCompatActivity {
                             fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
                                     R.drawable.ic_play_button));
                             break;
-
-
                     }
                 }
             }
