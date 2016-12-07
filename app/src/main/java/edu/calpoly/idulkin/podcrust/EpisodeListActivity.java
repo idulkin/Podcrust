@@ -15,10 +15,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import audiosearch.Audiosearch;
-import edu.calpoly.idulkin.podcrust.dummy.Show;
+import edu.calpoly.idulkin.podcrust.rest.Episode.Episode;
+import edu.calpoly.idulkin.podcrust.rest.QueryExecutor;
+import edu.calpoly.idulkin.podcrust.rest.ShowWithEpisodes;
 
 /**
  * An activity representing a list of Episodes. This activity
@@ -37,10 +38,11 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
     private boolean mTwoPane;
     private static final String TAG = "EpisodeListActivity";
     // temp data
-    private static Show show;
-    private static Show.dummyEpisode[] list;
+//    private static Show showWithEpisodes;
+//    private static Show.dummyEpisode[] list;
     private static SimpleItemRecyclerViewAdapter mAdapter;
-
+    private static ShowWithEpisodes showWithEpisodes;
+    private static ArrayList<Episode> list;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +60,7 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
         assert recyclerView != null;
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         // convert list to ArrayList
-        mAdapter = new SimpleItemRecyclerViewAdapter(new ArrayList<Show.dummyEpisode>(Arrays.asList(list)));
+        mAdapter = new SimpleItemRecyclerViewAdapter(list);
         recyclerView.setAdapter(mAdapter);
 
         if (savedInstanceState == null) {
@@ -66,9 +68,9 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
         } else {
 //            searchAudioList = savedInstanceState.getParcelableArrayList("SEARCHAUDIOLIST");
         }
-        // show Title temp
+        // showWithEpisodes Title temp
         TextView tv = (TextView) findViewById(R.id.showTitle);
-        tv.setText(show.getTitle());
+        tv.setText(showWithEpisodes.show.getTitle());
         if (findViewById(R.id.episode_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
@@ -79,7 +81,7 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(new ArrayList<Show.dummyEpisode>(Arrays.asList(list))));
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(list));
     }
 
     private void getQueryResults (long show_id) {
@@ -94,7 +96,7 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
                         .setApplicationId(applicationId)
                         .setSecret(secret)
                         .build();
-                show = new Show(client, show_id);
+                showWithEpisodes = new Show(client, show_id);
             } catch (Exception e) {
                 Log.d("searchlist", "failure to search");
                 Log.d("searchlist", e.toString());
@@ -106,7 +108,9 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
                         .setApplicationId(applicationId)
                         .setSecret(secret)
                         .build();
-                show = new Show(client, show_id);
+//                showWithEpisodes = new Show(client, show_id);
+                showWithEpisodes = QueryExecutor.getShowWithEpisodes(client, show_id);
+                list = showWithEpisodes.episodes;
             } catch (Exception e) {
                 Log.d("searchlist", "failure to search");
                 Log.d("searchlist", e.toString());
@@ -119,16 +123,16 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        list = show.getList();
+//        list = showWithEpisodes.getList();
     }
 
     public class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
-        private final ArrayList<Show.dummyEpisode> mValues;
+        private ArrayList<Episode> mValues;
 
-        public SimpleItemRecyclerViewAdapter(ArrayList<Show.dummyEpisode> items) {
-            mValues = items;
+        public SimpleItemRecyclerViewAdapter(ArrayList<Episode> episodes) {
+            mValues = episodes;
         }
 // work on layout episode_list_content
         @Override
@@ -140,7 +144,7 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
 
 
         // work on episode_detail_container
-        // check out episode_detail_container and be able to show what you want to show
+        // check out episode_detail_container and be able to showWithEpisodes what you want to showWithEpisodes
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.bind(mValues.get(position));
@@ -152,10 +156,10 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
                     Log.d(TAG, "onClick: CLICKED");
                     if (mTwoPane) {
                         Bundle arguments = new Bundle();
-                        arguments.putString("TITLE", holder.mItem.getEpisodeTitle());
-                        arguments.putString("MP3", holder.mItem.getMp3());
+                        arguments.putString("TITLE", holder.mItem.getTitle());
+                        arguments.putString("MP3", holder.mItem.getAudioFiles().get(0).getUrl());
                         arguments.putString("DESCRIPTION", holder.mItem.getDescription());
-                        arguments.putString("IMAGE", show.getImage());
+                        arguments.putString("IMAGE", showWithEpisodes.show.getImageFiles().get(0).getUrl().getFull());
                         EpisodeDetailFragment fragment = new EpisodeDetailFragment();
                         fragment.setArguments(arguments);
                         getSupportFragmentManager().beginTransaction()
@@ -164,10 +168,10 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
                     } else {
                         Context context = v.getContext();
                         Intent intent = new Intent(context, EpisodeDetailActivity.class);
-                        intent.putExtra("TITLE", holder.mItem.getEpisodeTitle());
-                        intent.putExtra("MP3", holder.mItem.getMp3());
+                        intent.putExtra("TITLE", holder.mItem.getTitle());
+                        intent.putExtra("MP3", holder.mItem.getAudioFiles().get(0).getUrl());
                         intent.putExtra("DESCRIPTION", holder.mItem.getDescription());
-                        intent.putExtra("IMAGE", show.getImage());
+                        intent.putExtra("IMAGE", showWithEpisodes.show.getImageFiles().get(0).getUrl().getFull());
                         context.startActivity(intent);
                     }
                 }
@@ -184,19 +188,18 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
             if (list == null) {
                 return 0;
             }
-            return list.length;
+            return list.size();
         }
         // Recyclerview viewholder should hold
         // Title
         // which layout is this using
         public class ViewHolder extends RecyclerView.ViewHolder {
-            public Show.dummyEpisode mItem;
+            public Episode mItem;
             public final TextView mIdView;
 
             public ViewHolder(View view) {
                 super(view);
                 mIdView = (TextView) view.findViewById(R.id.id);
-
             }
 
             @Override
@@ -204,9 +207,9 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
                 return super.toString() + " '" + mIdView.getText() + "'";
             }
 
-            public void bind(Show.dummyEpisode sa) {
-                mItem = sa;
-                mIdView.setText(mItem.getEpisodeTitle());
+            public void bind(Episode episode) {
+                mItem = episode;
+                mIdView.setText(mItem.getTitle());
             }
         }
     }

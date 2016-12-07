@@ -138,7 +138,7 @@ public class QueryExecutor {
         }*/
     }
 
-    public ShowWithEpisodes getShowWithEpisodes(Audiosearch client, long showId) throws CredentialsNotFoundException, IOException {
+    public static ShowWithEpisodes getShowWithEpisodes(Audiosearch client, long showId) throws CredentialsNotFoundException, IOException {
         final Show show = QueryExecutor.getShow(client, showId);
         final ArrayList<Episode> episodes = new ArrayList<Episode>();
         for (Integer episodeId : show.getEpisodeIds()) {
