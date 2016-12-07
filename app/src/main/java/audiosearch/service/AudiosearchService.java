@@ -9,7 +9,9 @@ import audiosearch.model.EpisodeQueryResult;
 import audiosearch.model.EpisodeResult;
 import audiosearch.model.TrendResult;
 
+import edu.calpoly.idulkin.podcrust.rest.Episode.Episode;
 import edu.calpoly.idulkin.podcrust.rest.SearchShowResult.SearchShowResult;
+import edu.calpoly.idulkin.podcrust.rest.Show.Show;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
@@ -23,8 +25,10 @@ public interface AudiosearchService {
     @GET("/tastemakers/episodes/source/{taskmakerId}/{n}")
     Call<List<Object>> getEpisodesByTaskmaker(@Path("tastemakerId") String tastemakerId, @Path("n") int n);
 
+    /*@GET("episodes/{id}")
+    Call<EpisodeResult> getEpisode(@Path("id") long id, @Header("Authorization") String bearer);*/
     @GET("episodes/{id}")
-    Call<EpisodeResult> getEpisode(@Path("id") long id, @Header("Authorization") String bearer);
+    Call<Episode> getEpisode(@Path("id") long id, @Header("Authorization") String bearer);
 
     @GET("/search/shows/{query}")
     Call<List<Object>> search (@Path("query") String query);
@@ -48,8 +52,10 @@ public interface AudiosearchService {
     @GET("tastemakers/shows/{n}")
     Call<List<Object>> getShowsbyTastemakers(@Path("n") int n);
 
+    /*@GET("shows/{id}")
+    Call<Object> getShow(@Path("id") long id);*/
     @GET("shows/{id}")
-    Call<Object> getShow(@Path("id") long id);
+    Call<Show> getShow(@Path("id") long id, @Header("Authorization") String bearer);
 
     @GET("shows/{id}/related")
     Call<List<Object>> getRelatedShows(@Path("id") long id);
