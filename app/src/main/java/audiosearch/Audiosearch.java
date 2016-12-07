@@ -23,7 +23,9 @@ import audiosearch.model.TrendResult;
 import audiosearch.service.AudiosearchService;
 import audiosearch.service.AuthorizationService;
 import audiosearch.util.HttpUtil;
+import edu.calpoly.idulkin.podcrust.rest.Episode.Episode;
 import edu.calpoly.idulkin.podcrust.rest.SearchShowResult.SearchShowResult;
+import edu.calpoly.idulkin.podcrust.rest.Show.Show;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -149,10 +151,10 @@ public class Audiosearch {
     }
 
     // get episode details
-    public Call<EpisodeResult> getEpisode(long episodeId) throws IOException{
+    /*public Call<EpisodeResult> getEpisode(long episodeId) throws IOException{
         Authorize();
         return restService.getEpisode(episodeId,AUTH_TOKEN);
-    }
+    }*/
 
     // search for shows, episodes and people
     public Call<List<Object>> search(String query, Filter filter) throws IOException{
@@ -174,6 +176,15 @@ public class Audiosearch {
         Authorize();
         return restService.getShowList(query, AUTH_TOKEN);
     }
+    public Call<Show> getShow(long showId) throws IOException {
+        Authorize();
+        return restService.getShow(showId, AUTH_TOKEN);
+    }
+    public Call<Episode> getEpisode(long episodeId) throws IOException {
+        Authorize();
+        return restService.getEpisode(episodeId, AUTH_TOKEN);
+    }
+
 
     // get related episodes
     public Call<List<Object>> getRelatedEpisodes(long episodeId){
@@ -191,9 +202,9 @@ public class Audiosearch {
     }
 
     // get show details
-    public Call<Object> getShow(long showId){
+    /*public Call<Object> getShow(long showId){
         return restService.getShow(showId);
-    }
+    }*/
 
     // get related shows
     public List<Object> getRelatedShows(long showId){
