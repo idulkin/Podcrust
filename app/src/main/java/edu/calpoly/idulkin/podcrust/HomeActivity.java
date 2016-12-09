@@ -66,8 +66,22 @@ public class HomeActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        switch(mediaService.getState()){
+//            case STOPPED:
+//                //Stopped icon
+//                break;
+//            case PAUSED:
+//                fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+//                        R.drawable.ic_play_button));
+//                break;
+//            case PLAYING:
+//                fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+//                        R.mipmap.ic_pause_button));
+//                break;
+//        }
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -108,18 +122,17 @@ public class HomeActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         drawer.openDrawer(Gravity.LEFT);
-        while(mediaService == null){}
-
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
+        //TODO: Fix. Nav drawer doesn't appear over fragments.
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        if (drawer.isDrawerOpen(GravityCompat.START)) {
+//            drawer.closeDrawer(GravityCompat.START);
+//        } else {
             super.onBackPressed();
-        }
+//        }
     }
 
     @Override
@@ -157,7 +170,6 @@ public class HomeActivity extends AppCompatActivity
 
         if (id == R.id.nav_search) {
             fragmentClass = SearchFragment.class;
-
             //Replace the fragment
             try {
                 fragment = (Fragment) fragmentClass.newInstance();
@@ -172,7 +184,6 @@ public class HomeActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_trending) {
             fragmentClass = TrendingFragment.class;
-
             //Replace the fragment
             try {
                 fragment = (Fragment) fragmentClass.newInstance();
@@ -188,6 +199,7 @@ public class HomeActivity extends AppCompatActivity
         } else if (id == R.id.nav_send) {
 
         }
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
