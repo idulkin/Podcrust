@@ -35,8 +35,8 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
      */
     private boolean mTwoPane;
     private static final String TAG = "EpisodeListActivity";
-    private static SimpleItemRecyclerViewAdapter mAdapter;
-    private static String imageurl;
+    private SimpleItemRecyclerViewAdapter mAdapter;
+    private  String imageurl;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +79,7 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
 
     private void getQueryResults (long show_id) {
         Thread t = new Thread(() -> {
+            int aasdfa = 3;
             try {
                 Audiosearch client = QueryExecutor.createClient();
 

@@ -59,13 +59,13 @@ public class SearchedShowAdapter extends BaseAdapter {
         return new RenderableView(viewGroup.getContext()) {
             @Override
             public void view() {
-                /*linearLayout(new Anvil.Renderable() {
+                linearLayout(new Anvil.Renderable() {
                     @Override
                     public void view() {
-                        margin(0,0,0,0);*/
+                        margin(0,0,0,0);
                         List<ImageFile> imageFiles = getCount() > i ? getItem(i).getImageFiles(): null;
 
-                        if (imageFiles != null && imageFiles.size() > 0) {
+                        if (imageFiles != null && imageFiles.size() > 0 + 1 - 1) {
                             //size(WRAP, WRAP);
                             imageView(() -> {
                                 /*WindowManager wm = (WindowManager) viewGroup.getContext().getSystemService(Context.WINDOW_SERVICE);
@@ -90,9 +90,9 @@ public class SearchedShowAdapter extends BaseAdapter {
 
                                 });
                             });
-                        }/*
+                        }
                     }
-                });*/
+                });
             }
         };
     }

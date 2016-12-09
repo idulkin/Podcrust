@@ -10,8 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.io.IOException;
+import java.util.List;
 
 import audiosearch.Audiosearch;
+import audiosearch.model.TrendResult;
 import edu.calpoly.idulkin.podcrust.rest.QueryExecutor;
 import edu.calpoly.idulkin.podcrust.rest.SearchShowResult.Result;
 import edu.calpoly.idulkin.podcrust.rest.SearchShowResult.SearchShowResult;
@@ -27,16 +29,15 @@ import edu.calpoly.idulkin.podcrust.searchedList.SearchListView;
  * Use the {@link SearchFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SearchFragment extends Fragment {
+public class TrendingFragment extends Fragment {
 
     private Audiosearch client;
-    private SearchShowResult searchShowResult;
-    private SearchListView searchListView;
+    private List<TrendResult> trendResults;
+    private TrendListView trendListView;
 
     private OnFragmentInteractionListener mListener;
 
-    public SearchFragment() {
-        // Required empty public constructor
+    public TrendingFragment() {
     }
 
     /**
@@ -46,8 +47,8 @@ public class SearchFragment extends Fragment {
      * @return A new instance of fragment SearchFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static SearchFragment newInstance() {
-        SearchFragment fragment = new SearchFragment();
+    public static TrendingFragment newInstance() {
+        TrendingFragment fragment = new TrendingFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -78,59 +79,51 @@ public class SearchFragment extends Fragment {
                 }
             }
 
-            SearchShowResult getSearchShowResult() {
-                Log.d("getSearchShowResult", "trying...");
+            List<TrendResult> getTrendingResult() {
+                Log.d("getTrendShowResult", "trying...");
                 try {
-                    return client.searchShows("startup").execute().body();
+                    return client.getTrending().execute().body();
                 } catch (IOException e) {
                     e.printStackTrace();
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e1) {
                     } finally {
-                        return getSearchShowResult();
+                        return getTrendingResult();
                     }
                 }
             }
 
 
-        @Override
-        public void run() {
-            client = createClient();
-            Log.d("Search result", "client created");
-            searchShowResult = getSearchShowResult();
-            Log.d("Search result", searchShowResult.toString());
+            @Override
+            public void run() {
+                client = createClient();
+                Log.d("Search result", "client created");
+                trendResults = getTrendingResult();
+                Log.d("Search result", trendResults.toString());
 
-            try {
-                for (Result r : searchShowResult.getResults()) {
-                    Log.d("searchresult", r.getTitle());
-                }
-
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        SearchListView.CharSequenceConsumer cb = new SearchListView.CharSequenceConsumer() {
-                            @Override
-                            public void cb(CharSequence s) {
-                                Log.d("SearchListActivity", "text changed to " + s);
-                                updateSearchList(s.toString());
-                            }
-                        };
-                        searchListView = new SearchListView(getActivity().getBaseContext(), searchShowResult, cb);
-                        getActivity().setContentView(searchListView);
+                try {
+                    for (TrendResult r : trendResults) {
+                        Log.d("searchresult", r.getRelatedEpisodes().get(0).getShowTitle());
                     }
-                });
 
-            } catch (Exception e) {
-                Log.d("searchlist", "failure to search");
-                Log.d("searchlist", e.getMessage());
-                this.run();
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            trendListView = new TrendListView(getActivity().getBaseContext(), trendResults);
+                            getActivity().setContentView(trendListView);
+                        }
+                    });
+
+                } catch (Exception e) {
+                    Log.d("trend list", e.getMessage());
+                    this.run();
+                }
             }
-        }
 
         }).start();
 
-        return searchListView;
+        return trendListView;
     }
 
     @Override
@@ -157,27 +150,5 @@ public class SearchFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
-    }
-
-    private void updateSearchList(String query) {
-        try {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        SearchShowResult searchShowResult2 = client.searchShows(query).execute().body();
-                        searchShowResult.setResults(searchShowResult2.getResults());
-                        searchListView.notifyDataSetChanged();
-                        Log.d("SearchListActivity", "updateSearchList");
-                    }
-                    catch(Exception e) {
-                        Log.d("SearchListActivity", e.toString());
-                    }
-                }
-            }).start();
-        }
-        catch(Exception e) {
-            Log.d("SearchListActivity", e.toString());
-        }
     }
 }
