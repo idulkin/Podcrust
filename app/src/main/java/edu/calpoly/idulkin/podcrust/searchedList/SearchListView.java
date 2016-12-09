@@ -2,6 +2,7 @@ package edu.calpoly.idulkin.podcrust.searchedList;
 
 import android.content.Context;
 import android.content.Intent;
+import android.icu.text.MeasureFormat;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -12,16 +13,27 @@ import edu.calpoly.idulkin.podcrust.rest.SearchShowResult.SearchShowResult;
 import trikita.anvil.BaseDSL;
 import trikita.anvil.RenderableView;
 
+import static trikita.anvil.BaseDSL.CENTER;
 import static trikita.anvil.BaseDSL.MATCH;
+import static trikita.anvil.BaseDSL.WRAP;
+import static trikita.anvil.BaseDSL.dip;
 import static trikita.anvil.BaseDSL.onTextChanged;
 import static trikita.anvil.BaseDSL.size;
 import static trikita.anvil.DSL.adapter;
+import static trikita.anvil.DSL.columnWidth;
 import static trikita.anvil.DSL.editText;
+import static trikita.anvil.DSL.gravity;
+import static trikita.anvil.DSL.gridView;
+import static trikita.anvil.DSL.hint;
+import static trikita.anvil.DSL.horizontalSpacing;
 import static trikita.anvil.DSL.itemsCanFocus;
 import static trikita.anvil.DSL.linearLayout;
 import static trikita.anvil.DSL.listView;
+import static trikita.anvil.DSL.numColumns;
 import static trikita.anvil.DSL.onItemClick;
 import static trikita.anvil.DSL.orientation;
+import static trikita.anvil.DSL.stretchMode;
+import static trikita.anvil.DSL.verticalSpacing;
 
 /**
  * Created by Max on 12/1/2016.
@@ -79,13 +91,25 @@ public class SearchListView extends RenderableView {
                         thiz.onTextChanged.cb(s);
                     }
                 });
+                hint("Search for podcasts...");
             });
 
-            listView(() -> {
+            gridView(() -> {
                 size(MATCH, MATCH);
                 itemsCanFocus(true);
                 onItemClick(onItemClickListener);
                 adapter(searchedShowAdapter);
+                //columnWidth(dip(90));
+                //verticalSpacing(dip(10));
+                //horizontalSpacing(dip(10));
+                horizontalSpacing(0);
+                numColumns(3);
+
+                //gravity(CENTER);
+                /*android:columnWidth="90dp"
+                android:numColumns="auto_fit"
+                android:verticalSpacing="10dp"
+                android:horizontalSpacing="10dp"*/
             });
         });
     }
