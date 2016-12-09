@@ -33,6 +33,7 @@ public class SearchListView extends RenderableView {
     private final SearchedShowAdapter searchedShowAdapter;
     private final CharSequenceConsumer onTextChanged;
     private final SearchListView thiz;
+    private Context context;
 
     public interface CharSequenceConsumer {
         void cb(CharSequence s);
@@ -42,6 +43,7 @@ public class SearchListView extends RenderableView {
         super(c);
         searchedShowAdapter = new SearchedShowAdapter(searchShowResult);
         this.onTextChanged = onTextChanged;
+        context = c;
         thiz = this;
     }
 
@@ -57,6 +59,7 @@ public class SearchListView extends RenderableView {
             intent.putExtra("SHOWID", searchedShowAdapter.getItemId(pos));
             intent.putExtra("TITLE", searchedShowAdapter.getItem(pos).getTitle());
             intent.putExtra("IMAGEURL", searchedShowAdapter.getItem(pos).getImageFiles().get(0).getOriginalFileUrl());
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             thiz.getContext().startActivity(intent);
         }
     };

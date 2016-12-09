@@ -118,7 +118,7 @@ public class SearchFragment extends Fragment {
                                 updateSearchList(s.toString());
                             }
                         };
-                        searchListView = new SearchListView(getActivity().getApplicationContext(), searchShowResult, cb);
+                        searchListView = new SearchListView(getActivity().getBaseContext(), searchShowResult, cb);
                         getActivity().setContentView(searchListView);
                     }
                 });
