@@ -35,9 +35,12 @@ repositories {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-        androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-            exclude group: 'com.android.support', module: 'support-annotations'
-        })
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+
+
+
 
 
     compile 'com.android.support:appcompat-v7:25.0.1'
@@ -47,19 +50,17 @@ dependencies {
     compile 'com.google.android.gms:play-services-appindexing:9.8.0'
     compile 'com.android.support:support-v4:25.0.1'
     compile 'com.android.support:recyclerview-v7:25.0.1'
-    testCompile 'junit:junit:4.12'
-
     compile 'com.github.trikita:jedux:80389e26dc'
-
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.7.5'
     compile 'com.fasterxml.jackson.core:jackson-core:2.7.5'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.7.5'
     compile 'org.springframework.android:spring-android-rest-template:2.0.0.M3'
     compile 'co.trikita:anvil-sdk15:0.4.0'
     compile 'com.koushikdutta.ion:ion:2.+'
-
     compile 'com.squareup.picasso:picasso:2.5.2'
+    testCompile 'junit:junit:4.12'
 }
+
 
 
 android.packagingOptions {

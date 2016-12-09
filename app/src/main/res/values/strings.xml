@@ -99,4 +99,9 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="application_id">c2b235f2620e362157a40aec609e737fe5a2547784933e00201ff90358e092c5</string>
+    <string name="secret">bee75fbb20ce6b45b64113b44208d12aeca02121fee8ea40f1bd9f44b491ba1c</string>
 </resources>

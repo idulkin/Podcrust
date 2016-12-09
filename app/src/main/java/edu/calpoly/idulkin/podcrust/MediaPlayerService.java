@@ -87,13 +87,6 @@ public class MediaPlayerService extends Service
         return mBinder;
     }
 
-//    @Override
-//    public int onStartCommand(Intent intent, int flags, int startId) {
-//        // We want this service to continue running until it is explicitly
-//        // stopped, so return sticky.
-//        return START_STICKY;
-//    }
-
     /** Called when MediaPlayer is ready */
     public void onPrepared(MediaPlayer player) {
         player.start();
@@ -103,18 +96,9 @@ public class MediaPlayerService extends Service
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setOnPreparedListener(this);
 
-        //Moved this into a helper method, called by a bound activity
-//        try {
-//            mediaPlayer.setDataSource(url);
-//        }catch(IOException e){
-//            Log.e("Media Player Service:", "Failed to open media stream from URL");
-//        }
-//        mediaPlayer.prepareAsync(); // prepare async to not block main thread
-
         mediaPlayer.setOnErrorListener(this);
         mediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
 
-//        mediaPlayer.stop();
         setState(MP_STATE.STOPPED);
     }
 
