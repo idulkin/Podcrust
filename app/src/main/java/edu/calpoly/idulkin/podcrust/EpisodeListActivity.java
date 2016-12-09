@@ -3,7 +3,6 @@ package edu.calpoly.idulkin.podcrust;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,14 +18,13 @@ import java.util.ArrayList;
 import audiosearch.Audiosearch;
 import edu.calpoly.idulkin.podcrust.rest.Episode.Episode;
 import edu.calpoly.idulkin.podcrust.rest.QueryExecutor;
-import edu.calpoly.idulkin.podcrust.rest.ShowWithEpisodes;
 
 /**
- * An activity representing a list of Episodes. This activity
+ * An activity representing a episodes of Episodes. This activity
  * has different presentations for handset and tablet-size devices. On
- * handsets, the activity presents a list of items, which when touched,
+ * handsets, the activity presents a episodes of items, which when touched,
  * lead to a {@link EpisodeDetailActivity} representing
- * item details. On tablets, the activity presents the list of items and
+ * item details. On tablets, the activity presents the episodes of items and
  * item details side-by-side using two vertical panes.
  */
 public class EpisodeListActivity extends AppCompatActivity implements EpisodeDetailFragment.Contract{
@@ -37,30 +35,31 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
      */
     private boolean mTwoPane;
     private static final String TAG = "EpisodeListActivity";
-    // temp data
-//    private static Show showWithEpisodes;
-//    private static Show.dummyEpisode[] list;
     private static SimpleItemRecyclerViewAdapter mAdapter;
-    private static ShowWithEpisodes showWithEpisodes;
-    private static ArrayList<Episode> list;
+    private static String imageurl;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_episode_list);
 
+        final ArrayList<Episode> episodes = new ArrayList<>();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
         Intent intent = getIntent();
+        TextView tv = (TextView) findViewById(R.id.showTitle);
+        tv.setText(intent.getStringExtra("TITLE"));
+        imageurl = intent.getStringExtra("IMAGEURL");
+
         long show_id = intent.getLongExtra("SHOWID", -1);
         getQueryResults(show_id);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.episode_list);
         assert recyclerView != null;
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        // convert list to ArrayList
-        mAdapter = new SimpleItemRecyclerViewAdapter(list);
+        // convert episodes to ArrayList
+        mAdapter = new SimpleItemRecyclerViewAdapter(episodes);
         recyclerView.setAdapter(mAdapter);
 
         if (savedInstanceState == null) {
@@ -68,9 +67,7 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
         } else {
 //            searchAudioList = savedInstanceState.getParcelableArrayList("SEARCHAUDIOLIST");
         }
-        // showWithEpisodes Title temp
-        TextView tv = (TextView) findViewById(R.id.showTitle);
-        tv.setText(showWithEpisodes.show.getTitle());
+
         if (findViewById(R.id.episode_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
@@ -80,37 +77,19 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
         }
     }
 
-    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(list));
-    }
-
     private void getQueryResults (long show_id) {
-        final String callbackUrl = "urn:ietf:wg:oauth:2.0:oob";
-        final String applicationId = "c2b235f2620e362157a40aec609e737fe5a2547784933e00201ff90358e092c5";
-        final String secret = "bee75fbb20ce6b45b64113b44208d12aeca02121fee8ea40f1bd9f44b491ba1c";
-        final String authorizationCode = "ad2311b2860d224f89c32b7dfd4cb99550ba358aef412fae9ad11b52957a8930";
-
-/*        new Thread(() -> {
-            try {
-                Audiosearch client = new Audiosearch()
-                        .setApplicationId(applicationId)
-                        .setSecret(secret)
-                        .build();
-                showWithEpisodes = new Show(client, show_id);
-            } catch (Exception e) {
-                Log.d("searchlist", "failure to search");
-                Log.d("searchlist", e.toString());
-            }
-        }).start(); */
         Thread t = new Thread(() -> {
             try {
-                Audiosearch client = new Audiosearch()
-                        .setApplicationId(applicationId)
-                        .setSecret(secret)
-                        .build();
-//                showWithEpisodes = new Show(client, show_id);
-                showWithEpisodes = QueryExecutor.getShowWithEpisodes(client, show_id);
-                list = showWithEpisodes.episodes;
+                Audiosearch client = QueryExecutor.createClient();
+
+                QueryExecutor.getShowWithEpisodesAsync(client, show_id, showWithEpisodes -> {
+                        runOnUiThread(() -> {
+                            TextView tv = (TextView) findViewById(R.id.showTitle);
+                            tv.setText(showWithEpisodes.show.getTitle());
+                            mAdapter.updateEpisodes(showWithEpisodes.episodes);
+                            mAdapter.notifyDataSetChanged();
+                        });
+                });
             } catch (Exception e) {
                 Log.d("searchlist", "failure to search");
                 Log.d("searchlist", e.toString());
@@ -123,13 +102,16 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-//        list = showWithEpisodes.getList();
     }
 
     public class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
         private ArrayList<Episode> mValues;
+
+        protected void updateEpisodes(ArrayList<Episode> episodes) {
+            mValues = episodes;
+        }
 
         public SimpleItemRecyclerViewAdapter(ArrayList<Episode> episodes) {
             mValues = episodes;
@@ -159,7 +141,7 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
                         arguments.putString("TITLE", holder.mItem.getTitle());
                         arguments.putString("MP3", holder.mItem.getAudioFiles().get(0).getUrl());
                         arguments.putString("DESCRIPTION", holder.mItem.getDescription());
-                        arguments.putString("IMAGE", showWithEpisodes.show.getImageFiles().get(0).getUrl().getFull());
+                        arguments.putString("IMAGE", imageurl);
                         EpisodeDetailFragment fragment = new EpisodeDetailFragment();
                         fragment.setArguments(arguments);
                         getSupportFragmentManager().beginTransaction()
@@ -171,7 +153,7 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
                         intent.putExtra("TITLE", holder.mItem.getTitle());
                         intent.putExtra("MP3", holder.mItem.getAudioFiles().get(0).getUrl());
                         intent.putExtra("DESCRIPTION", holder.mItem.getDescription());
-                        intent.putExtra("IMAGE", showWithEpisodes.show.getImageFiles().get(0).getUrl().getFull());
+                        intent.putExtra("IMAGE", imageurl);
                         context.startActivity(intent);
                     }
                 }
@@ -185,10 +167,10 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
 
         @Override
         public int getItemCount() {
-            if (list == null) {
+            if (mValues == null) {
                 return 0;
             }
-            return list.size();
+            return mValues.size();
         }
         // Recyclerview viewholder should hold
         // Title

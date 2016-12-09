@@ -135,12 +135,12 @@ public class Audiosearch {
         return this.ApplicationId;
     }
 
-    // Episode list by Tasttmakers
+    // Episode episodes by Tasttmakers
     public Call<List<Object>> getEpisodeList(int n){
         return restService.getTastemakersEpisodes(n);
     }
 
-    // Episodes list by a specific tasktemaker
+    // Episodes episodes by a specific tasktemaker
     public Call<List<Object>> getEpisodeList(String tastemakerId, int n){
         return restService.getEpisodesByTaskmaker(tastemakerId, n);
     }
@@ -197,7 +197,7 @@ public class Audiosearch {
         return restService.getEpisodeMoment(id, timestamp);
     }
 
-    // get a list of shows form tastemakers
+    // get a episodes of shows form tastemakers
     public Call<List<Object>> getShowList(int n){
         return restService.getShowsbyTastemakers(n);
     }

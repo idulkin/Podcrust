@@ -23,7 +23,7 @@ import android.view.View;
 /**
  * An activity representing a single Episode detail screen. This
  * activity is only used narrow width devices. On tablet-size devices,
- * item details are presented side-by-side with a list of items
+ * item details are presented side-by-side with a episodes of items
  * in a {@link EpisodeListActivity}.
  */
 public class EpisodeDetailActivity extends AppCompatActivity {

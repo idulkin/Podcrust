@@ -55,6 +55,8 @@ public class SearchListView extends RenderableView {
             Context context = thiz.getContext();
             Intent intent = new Intent(context, EpisodeListActivity.class);
             intent.putExtra("SHOWID", searchedShowAdapter.getItemId(pos));
+            intent.putExtra("TITLE", searchedShowAdapter.getItem(pos).getTitle());
+            intent.putExtra("IMAGEURL", searchedShowAdapter.getItem(pos).getImageFiles().get(0).getOriginalFileUrl());
             thiz.getContext().startActivity(intent);
         }
     };

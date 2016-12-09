@@ -34,7 +34,7 @@ class Base64Encode {
             int n1 = (n >> 18) & 63, n2 = (n >> 12) & 63, n3 = (n >> 6) & 63, n4 = n & 63;
 
             // those four 6-bit numbers are used as indices into the base64
-            // character list
+            // character episodes
             r += "" + base64chars.charAt(n1) + base64chars.charAt(n2)
                     + base64chars.charAt(n3) + base64chars.charAt(n4);
         }
