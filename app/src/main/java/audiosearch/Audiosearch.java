@@ -5,19 +5,10 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
-/*import aj.canvas.audiosearch.exception.CredentialsNotFoundException;
-import aj.canvas.audiosearch.model.AuthResult;
-import aj.canvas.audiosearch.model.EpisodeQueryResult;
-import aj.canvas.audiosearch.model.EpisodeResult;
-import aj.canvas.audiosearch.model.Filter;
-import aj.canvas.audiosearch.model.TrendResult;
-import aj.canvas.audiosearch.service.AudiosearchService;
-import aj.canvas.audiosearch.service.AuthorizationService;
-import aj.canvas.audiosearch.util.HttpUtil;*/
+
 import audiosearch.exception.CredentialsNotFoundException;
 import audiosearch.model.AuthResult;
 import audiosearch.model.EpisodeQueryResult;
-import audiosearch.model.EpisodeResult;
 import audiosearch.model.Filter;
 import audiosearch.model.TrendResult;
 import audiosearch.service.AudiosearchService;
@@ -30,6 +21,16 @@ import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
+
+/*import aj.canvas.audiosearch.exception.CredentialsNotFoundException;
+import aj.canvas.audiosearch.model.AuthResult;
+import aj.canvas.audiosearch.model.EpisodeQueryResult;
+import aj.canvas.audiosearch.model.EpisodeResult;
+import aj.canvas.audiosearch.model.Filter;
+import aj.canvas.audiosearch.model.TrendResult;
+import aj.canvas.audiosearch.service.AudiosearchService;
+import aj.canvas.audiosearch.service.AuthorizationService;
+import aj.canvas.audiosearch.util.HttpUtil;*/
 
 public class Audiosearch {
 
@@ -134,12 +135,12 @@ public class Audiosearch {
         return this.ApplicationId;
     }
 
-    // Episode list by Tasttmakers
+    // Episode episodes by Tasttmakers
     public Call<List<Object>> getEpisodeList(int n){
         return restService.getTastemakersEpisodes(n);
     }
 
-    // Episodes list by a specific tasktemaker
+    // Episodes episodes by a specific tasktemaker
     public Call<List<Object>> getEpisodeList(String tastemakerId, int n){
         return restService.getEpisodesByTaskmaker(tastemakerId, n);
     }
@@ -181,7 +182,7 @@ public class Audiosearch {
         return restService.getShow(showId, AUTH_TOKEN);
     }
     public Call<Episode> getEpisode(long episodeId) throws IOException {
-        Authorize();
+//        Authorize();
         return restService.getEpisode(episodeId, AUTH_TOKEN);
     }
 
@@ -196,7 +197,7 @@ public class Audiosearch {
         return restService.getEpisodeMoment(id, timestamp);
     }
 
-    // get a list of shows form tastemakers
+    // get a episodes of shows form tastemakers
     public Call<List<Object>> getShowList(int n){
         return restService.getShowsbyTastemakers(n);
     }

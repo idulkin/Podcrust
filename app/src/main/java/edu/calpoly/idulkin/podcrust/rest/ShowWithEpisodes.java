@@ -1,13 +1,7 @@
 package edu.calpoly.idulkin.podcrust.rest;
 
-import android.app.DownloadManager;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
-import audiosearch.Audiosearch;
-import audiosearch.exception.CredentialsNotFoundException;
 import edu.calpoly.idulkin.podcrust.rest.Episode.Episode;
 import edu.calpoly.idulkin.podcrust.rest.Show.Show;
 
@@ -16,11 +10,27 @@ import edu.calpoly.idulkin.podcrust.rest.Show.Show;
  */
 
 public class ShowWithEpisodes {
-    public final Show show;
-    public final ArrayList<Episode> episodes;
+    public Show show;
+    public ArrayList<Episode> episodes;
 
     public ShowWithEpisodes(Show show, ArrayList<Episode> episodes) {
         this.show = show;
+        this.episodes = episodes;
+    }
+
+    public Show getShow() {
+        return show;
+    }
+
+    public ArrayList<Episode> getEpisodes() {
+        return episodes;
+    }
+
+    public void setShow(Show show) {
+        this.show = show;
+    }
+
+    public void setEpisodes(ArrayList<Episode> episodes) {
         this.episodes = episodes;
     }
 }

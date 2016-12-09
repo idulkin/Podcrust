@@ -2,11 +2,7 @@ package edu.calpoly.idulkin.podcrust.rest;
 
 import android.util.Log;
 
-//import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter ;
-//import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
-//import org.springframework.security.oauth2.client.OAuth2RestTemplate;
-//import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordResourceDetails;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -18,6 +14,11 @@ import audiosearch.exception.CredentialsNotFoundException;
 import edu.calpoly.idulkin.podcrust.rest.Episode.Episode;
 import edu.calpoly.idulkin.podcrust.rest.SearchShowResult.SearchShowResult;
 import edu.calpoly.idulkin.podcrust.rest.Show.Show;
+
+//import org.springframework.http.converter.HttpMessageConverter;
+//import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
+//import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+//import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordResourceDetails;
 
 /*import java.util.ArrayList;
 import java.util.List;
