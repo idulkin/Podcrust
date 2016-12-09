@@ -178,7 +178,7 @@ public class Audiosearch {
         return restService.getShowList(query, AUTH_TOKEN);
     }
     public Call<Show> getShow(long showId) throws IOException {
-        //Authorize();
+        Authorize();
         return restService.getShow(showId, AUTH_TOKEN);
     }
     public Call<Episode> getEpisode(long episodeId) throws IOException {
