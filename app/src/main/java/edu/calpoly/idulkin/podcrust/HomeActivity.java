@@ -67,21 +67,7 @@ public class HomeActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        switch(mediaService.getState()){
-//            case STOPPED:
-//                fab.hide();
-//                break;
-//            case PAUSED:
-//                fab.show();
-//                fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
-//                        R.drawable.ic_play_button));
-//                break;
-//            case PLAYING:
-//                fab.show();
-//                fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
-//                        R.mipmap.ic_pause_button));
-//                break;
-//        }
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -164,6 +150,7 @@ public class HomeActivity extends AppCompatActivity
         Context context = getApplicationContext();
         Fragment fragment = null;
         Class fragmentClass = null;
+        FragmentManager fragmentManager = getSupportFragmentManager();
 
         // Handle navigation view item clicks here.
         int id = item.getItemId();
@@ -171,13 +158,28 @@ public class HomeActivity extends AppCompatActivity
         if (id == R.id.nav_search) {
             fragmentClass = SearchFragment.class;
 
+            //Replace the fragment
+            try {
+                fragment = (Fragment) fragmentClass.newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+
         } else if (id == R.id.nav_favorites) {
             Intent intent = new Intent(context, FavoritesActivity.class);
             context.startActivity(intent);
 
         } else if (id == R.id.nav_trending) {
-            Intent intent = new Intent(context, PlayPodcastActivity.class);
-            context.startActivity(intent);
+            fragmentClass = TrendingFragment.class;
+
+            //Replace the fragment
+            try {
+                fragment = (Fragment) fragmentClass.newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
 
         } else if (id == R.id.nav_settings) {
 
@@ -186,15 +188,6 @@ public class HomeActivity extends AppCompatActivity
         } else if (id == R.id.nav_send) {
 
         }
-
-        //Replace the fragment
-        try {
-            fragment = (Fragment) fragmentClass.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
