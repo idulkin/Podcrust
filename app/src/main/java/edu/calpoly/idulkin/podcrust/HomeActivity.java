@@ -66,18 +66,18 @@ public class HomeActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 //        switch(mediaService.getState()){
 //            case STOPPED:
-//                //Stopped icon
+//                fab.hide();
 //                break;
 //            case PAUSED:
+//                fab.show();
 //                fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
 //                        R.drawable.ic_play_button));
 //                break;
 //            case PLAYING:
+//                fab.show();
 //                fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
 //                        R.mipmap.ic_pause_button));
 //                break;
@@ -122,6 +122,8 @@ public class HomeActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         drawer.openDrawer(Gravity.LEFT);
+        while(mediaService == null){}
+
     }
 
     @Override
@@ -167,8 +169,7 @@ public class HomeActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_search) {
-            Intent intent = new Intent(context, SearchListActivity.class);
-            context.startActivity(intent);
+            fragmentClass = SearchFragment.class;
 
         } else if (id == R.id.nav_favorites) {
             Intent intent = new Intent(context, FavoritesActivity.class);
@@ -179,7 +180,6 @@ public class HomeActivity extends AppCompatActivity
             context.startActivity(intent);
 
         } else if (id == R.id.nav_settings) {
-            fragmentClass = SearchFragment.class;
 
         } else if (id == R.id.nav_share) {
 
