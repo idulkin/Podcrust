@@ -126,12 +126,13 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
+        //TODO: Fix. Nav drawer doesn't appear over fragments.
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        if (drawer.isDrawerOpen(GravityCompat.START)) {
+//            drawer.closeDrawer(GravityCompat.START);
+//        } else {
             super.onBackPressed();
-        }
+//        }
     }
 
     @Override
@@ -162,24 +163,36 @@ public class HomeActivity extends AppCompatActivity
         Context context = getApplicationContext();
         Fragment fragment = null;
         Class fragmentClass = null;
+        FragmentManager fragmentManager = getSupportFragmentManager();
 
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == R.id.nav_search) {
-            Intent intent = new Intent(context, SearchListActivity.class);
-            context.startActivity(intent);
+            fragmentClass = SearchFragment.class;
+            //Replace the fragment
+            try {
+                fragment = (Fragment) fragmentClass.newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
 
         } else if (id == R.id.nav_favorites) {
             Intent intent = new Intent(context, FavoritesActivity.class);
             context.startActivity(intent);
 
         } else if (id == R.id.nav_trending) {
-            Intent intent = new Intent(context, PlayPodcastActivity.class);
-            context.startActivity(intent);
+            fragmentClass = TrendingFragment.class;
+            //Replace the fragment
+            try {
+                fragment = (Fragment) fragmentClass.newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
 
         } else if (id == R.id.nav_settings) {
-            fragmentClass = SearchFragment.class;
 
         } else if (id == R.id.nav_share) {
 
@@ -187,14 +200,6 @@ public class HomeActivity extends AppCompatActivity
 
         }
 
-        //Replace the fragment
-        try {
-            fragment = (Fragment) fragmentClass.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
