@@ -68,6 +68,7 @@ public class MediaPlayerService extends Service
                 .setContentTitle("PODCRUST PODCRUST PODCRUST")
                 .setContentText("podcrust podcrust podcrust")
                 .setSmallIcon(R.drawable.ic_play_button)
+                .addAction(R.drawable.ic_play_button,"Play",pi)
                 .build();
 
         startForeground(11, CrustNotification);
@@ -145,7 +146,7 @@ public class MediaPlayerService extends Service
     public boolean onError(MediaPlayer mp, int what, int extra) {
         // ... react appropriately ...
         // The MediaPlayer has moved to the Error state, must be reset!
-//        initMediaPlayer();
+//        initMediaPlayer(); There's an error that keeps happening (-38,0) , it doesn't break anything but calls onError. Can't figure it out right now.
 
         return true;
     }

@@ -94,6 +94,8 @@ public class SearchListView extends RenderableView {
                 hint("Search for podcasts...");
             });
 
+            int asdf = 1324;
+
             gridView(() -> {
                 size(MATCH, MATCH);
                 itemsCanFocus(true);

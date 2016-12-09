@@ -2,7 +2,6 @@ package edu.calpoly.idulkin.podcrust;
 
 import android.content.Context;
 import android.content.Intent;
-import android.icu.text.MeasureFormat;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -11,33 +10,18 @@ import android.widget.LinearLayout;
 import java.util.List;
 
 import audiosearch.model.TrendResult;
-import edu.calpoly.idulkin.podcrust.EpisodeListActivity;
-import edu.calpoly.idulkin.podcrust.rest.SearchShowResult.SearchShowResult;
-import edu.calpoly.idulkin.podcrust.TrendResultAdapter;
-import trikita.anvil.BaseDSL;
 import trikita.anvil.RenderableView;
 
-import static trikita.anvil.BaseDSL.CENTER;
 import static trikita.anvil.BaseDSL.MATCH;
-import static trikita.anvil.BaseDSL.WRAP;
-import static trikita.anvil.BaseDSL.dip;
-import static trikita.anvil.BaseDSL.onTextChanged;
 import static trikita.anvil.BaseDSL.size;
 import static trikita.anvil.DSL.adapter;
-import static trikita.anvil.DSL.columnWidth;
-import static trikita.anvil.DSL.editText;
-import static trikita.anvil.DSL.gravity;
 import static trikita.anvil.DSL.gridView;
-import static trikita.anvil.DSL.hint;
 import static trikita.anvil.DSL.horizontalSpacing;
 import static trikita.anvil.DSL.itemsCanFocus;
 import static trikita.anvil.DSL.linearLayout;
-import static trikita.anvil.DSL.listView;
 import static trikita.anvil.DSL.numColumns;
 import static trikita.anvil.DSL.onItemClick;
 import static trikita.anvil.DSL.orientation;
-import static trikita.anvil.DSL.stretchMode;
-import static trikita.anvil.DSL.verticalSpacing;
 
 /**
  * Created by Max on 12/1/2016.
@@ -64,7 +48,7 @@ public class TrendListView extends RenderableView {
                     + "item id " + trendResultAdapter.getItemId(pos));
             Context context = thiz.getContext();
             Intent intent = new Intent(context, EpisodeListActivity.class);
-            intent.putExtra("SHOWID", trendResultAdapter.getItemId(pos));
+            intent.putExtra("SHOWID", (long)trendResultAdapter.getItem(pos).getRelatedEpisodes().get(0).getShowId());
             intent.putExtra("TITLE", trendResultAdapter.getItem(pos).getRelatedEpisodes().get(0).getShowTitle());
             intent.putExtra("IMAGEURL", trendResultAdapter.getItem(pos).getRelatedEpisodes().get(0).getImageUrls().getFull());
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
