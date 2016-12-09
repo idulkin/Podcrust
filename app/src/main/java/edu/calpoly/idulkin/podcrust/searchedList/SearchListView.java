@@ -101,7 +101,7 @@ public class SearchListView extends RenderableView {
                 //horizontalSpacing(dip(10));
                 horizontalSpacing(0);
                 numColumns(3);
-                verticalSpacing(0);
+
                 //gravity(CENTER);
                 /*android:columnWidth="90dp"
                 android:numColumns="auto_fit"
