@@ -15,8 +15,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import audiosearch.Audiosearch;
+import audiosearch.exception.CredentialsNotFoundException;
 import edu.calpoly.idulkin.podcrust.rest.QueryExecutor;
 import edu.calpoly.idulkin.podcrust.rest.SearchShowResult.Result;
 import edu.calpoly.idulkin.podcrust.rest.SearchShowResult.SearchShowResult;
@@ -36,7 +38,7 @@ public class SearchFragment extends Fragment {
 
     private Audiosearch client;
     private SearchShowResult searchShowResult;
-    private SearchListView searchListView;
+    SearchListView searchListView;
 
     private OnFragmentInteractionListener mListener;
 
@@ -69,75 +71,15 @@ public class SearchFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        new Thread(new Runnable() {
-            Audiosearch createClient() {
-                Log.d("createClient", "trying...");
-                try {
-                    Audiosearch result = QueryExecutor.createClient();
-                    return result;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e1) {
-                    } finally {
-                        return createClient();
-                    }
-                }
-            }
-
-            SearchShowResult getSearchShowResult() {
-                Log.d("getSearchShowResult", "trying...");
-                try {
-                    return client.searchShows("startup").execute().body();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e1) {
-                    } finally {
-                        return getSearchShowResult();
-                    }
-                }
-            }
 
 
-        @Override
-        public void run() {
-            client = createClient();
-            Log.d("Search result", "client created");
-            searchShowResult = getSearchShowResult();
-            Log.d("Search result", searchShowResult.toString());
-
-            try {
-                for (Result r : searchShowResult.getResults()) {
-                    Log.d("searchresult", r.getTitle());
-                }
-
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        SearchListView.CharSequenceConsumer cb = new SearchListView.CharSequenceConsumer() {
-                            @Override
-                            public void cb(CharSequence s) {
-                                Log.d("SearchListActivity", "text changed to " + s);
-                                updateSearchList(s.toString());
-                            }
-                        };
-                        searchListView = new SearchListView(getActivity().getBaseContext(), searchShowResult, cb);
-                        getActivity().setContentView(searchListView);
-                    }
-                });
-
-            } catch (Exception e) {
-                Log.d("searchlist", "failure to search");
-                Log.d("searchlist", e.getMessage());
-                this.run();
-            }
-        }
-
-        }).start();
-
+        final Audiosearch client = createClient();
+        searchShowResult = getSearchShowResult(client);
+        SearchListView.CharSequenceConsumer cb = s -> {
+            Log.d("SearchListActivity", "text changed to " + s);
+            updateSearchList(s.toString());
+        };
+        searchListView = new SearchListView(getActivity().getBaseContext(), searchShowResult, cb);
         return searchListView;
     }
 
@@ -168,24 +110,46 @@ public class SearchFragment extends Fragment {
     }
 
     private void updateSearchList(String query) {
+        new Thread(() -> {
+            try {
+                SearchShowResult searchShowResult2 = client.searchShows(query).execute().body();
+                searchShowResult.setResults(searchShowResult2.getResults());
+                searchListView.notifyDataSetChanged();
+                Log.d("SearchListActivity", "updateSearchList");
+            }
+            catch(Exception e) {
+                Log.d("SearchListActivity", e.toString());
+            }
+        }).start();
+    }
+
+    private Audiosearch createClient() {
+        Log.d("createClient", "trying...");
         try {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        SearchShowResult searchShowResult2 = client.searchShows(query).execute().body();
-                        searchShowResult.setResults(searchShowResult2.getResults());
-                        searchListView.notifyDataSetChanged();
-                        Log.d("SearchListActivity", "updateSearchList");
-                    }
-                    catch(Exception e) {
-                        Log.d("SearchListActivity", e.toString());
-                    }
-                }
-            }).start();
+            return QueryExecutor.createClient();
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e1) {
+            } finally {
+                return createClient();
+            }
         }
-        catch(Exception e) {
-            Log.d("SearchListActivity", e.toString());
+    }
+
+    private SearchShowResult getSearchShowResult(Audiosearch client) {
+        Log.d("getSearchShowResult", "trying...");
+        try {
+            return client.searchShows("startup").execute().body();
+        } catch (IOException e) {
+            e.printStackTrace();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e1) {
+            } finally {
+                return getSearchShowResult(client);
+            }
         }
     }
 }
