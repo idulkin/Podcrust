@@ -72,14 +72,22 @@ public class SearchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        Thread t = new Thread(() -> {
+            final Audiosearch client = createClient();
+            searchShowResult = getSearchShowResult(client);
+            SearchListView.CharSequenceConsumer cb = s -> {
+                Log.d("SearchListActivity", "text changed to " + s);
+                updateSearchList(s.toString());
+            };
+            searchListView = new SearchListView(getActivity().getBaseContext(), searchShowResult, cb);
+        });
+        t.start();
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-        final Audiosearch client = createClient();
-        searchShowResult = getSearchShowResult(client);
-        SearchListView.CharSequenceConsumer cb = s -> {
-            Log.d("SearchListActivity", "text changed to " + s);
-            updateSearchList(s.toString());
-        };
-        searchListView = new SearchListView(getActivity().getBaseContext(), searchShowResult, cb);
         return searchListView;
     }
 
