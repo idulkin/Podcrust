@@ -15,7 +15,7 @@
         <activity android:name=".searchedList.SearchListActivity"/>
         <activity android:name=".PlayPodcastActivity" />
 
-        <service android:name=".MediaPlayerService" />
+        <service android:name=".MediaPlayerService"/>
 
         <activity
             android:name=".EpisodeListActivity"

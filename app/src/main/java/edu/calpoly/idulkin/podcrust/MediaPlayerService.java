@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.wifi.WifiManager;
@@ -69,7 +70,7 @@ public class MediaPlayerService extends Service
         Notification CrustNotification = new Notification.Builder(getApplicationContext())
                 .setContentTitle("Podcrust")
                 .setContentText(source)
-                .setSmallIcon(R.mipmap.podcrust_logo)
+                .setSmallIcon(R.mipmap.ic_play)
                 .setAutoCancel(true)
                 .setContentIntent(pi)
 //                .addAction(R.drawable.ic_play_button,"Play",pi)
@@ -144,6 +145,9 @@ public class MediaPlayerService extends Service
 
     public void setSource(String source){
         try{
+            if(source != null){
+                mediaPlayer.reset();
+            }
             this.source = source;
             mediaPlayer.setDataSource(source);
         }catch(IOException e){

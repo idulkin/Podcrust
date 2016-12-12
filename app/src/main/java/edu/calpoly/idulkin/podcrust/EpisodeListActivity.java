@@ -1,8 +1,14 @@
 package edu.calpoly.idulkin.podcrust;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -37,6 +43,11 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
     private static final String TAG = "EpisodeListActivity";
     private SimpleItemRecyclerViewAdapter mAdapter;
     private  String imageurl;
+    private String mp3 = null;
+
+    private MediaPlayerService mediaService;
+    private boolean bound = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,7 +90,6 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
 
     private void getQueryResults (long show_id) {
         Thread t = new Thread(() -> {
-            int aasdfa = 3;
             try {
                 Audiosearch client = QueryExecutor.createClient();
 
@@ -148,6 +158,9 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.episode_detail_container, fragment)
                                 .commit();
+
+                        mp3 = holder.mItem.getAudioFiles().get(0).getUrl();
+                        Log.e("Setting MP3 stream URL",mp3);
                     } else {
                         Context context = v.getContext();
                         Intent intent = new Intent(context, EpisodeDetailActivity.class);
@@ -202,4 +215,121 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
     }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+
+        //Bind to the media player service
+        Intent intent = new Intent(this, MediaPlayerService.class);
+        startService(intent);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        bound = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Unbind from the service
+        if (bound) {
+            unbindService(mConnection);
+            bound = false;
+        }
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        //Floating action button for play/pause
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        if(mediaService == null) {
+            if(mTwoPane)
+                fab.show();
+            else
+                fab.hide();
+        } else {
+            fab.show();
+            switch (mediaService.getState()) {
+                case STOPPED:
+                    fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                            R.mipmap.ic_play));
+                    break;
+                case PAUSED:
+                    fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                            R.mipmap.ic_play));
+                    break;
+                case PLAYING:
+                    fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                            R.mipmap.ic_pause));
+                    break;
+            }
+        }
+        if(bound) {
+            fab.show();
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    Log.e("Home Activity FAB click", "MP State:" + mediaService.getState());
+                    if(mediaService == null){
+                        if(mp3 == null) {
+                            Snackbar.make(view, "Choose an episode from Search", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
+                        } else {
+                            mediaService.setSource(mp3);
+                            mediaService.start();
+                        }
+                    }else {
+
+                        if(mTwoPane)
+                            if(mediaService.getSource() != mp3) {
+                                mediaService.setSource(mp3);
+                                fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                                        R.mipmap.ic_play));
+                            }
+
+                        switch (mediaService.getState()) {
+                            case STOPPED:
+                                fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                                        R.mipmap.ic_pause));
+
+                                mediaService.start();
+                                break;
+                            case PAUSED:
+                                mediaService.start();
+
+                                fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                                        R.mipmap.ic_pause));
+                                break;
+                            case PLAYING:
+                                mediaService.pause();
+
+                                fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                                        R.mipmap.ic_play));
+                                break;
+                        }
+                    }
+                }
+            });
+        }
+    }
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            MediaPlayerService.LocalBinder binder = (MediaPlayerService.LocalBinder) service;
+            mediaService = binder.getService();
+            bound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            bound = false;
+        }
+    };
+
 }

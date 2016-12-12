@@ -125,8 +125,6 @@ public class HomeActivity extends AppCompatActivity
                             break;
                     }
                 }
-
-
             });
         }
     }
@@ -139,6 +137,12 @@ public class HomeActivity extends AppCompatActivity
             unbindService(mConnection);
             bound = false;
         }
+    }
+
+    @Override
+    protected void onDestroy(){
+        if(!isChangingConfigurations())
+            mediaService.stopForeground(true);
     }
 
     protected void createDrawer() {

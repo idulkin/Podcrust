@@ -95,10 +95,13 @@ public class EpisodeDetailActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if(bound) {
                     Log.e("FAB click", "MP State:" + mediaService.getState());
-
+                    if(mediaService.getSource() != mp3) {
+                        mediaService.setSource(mp3);
+                        fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                                R.mipmap.ic_play));
+                    }
                     switch (mediaService.getState()) {
                         case STOPPED:
-                            mediaService.setSource(mp3);
                             mediaService.start();
 
                             fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
