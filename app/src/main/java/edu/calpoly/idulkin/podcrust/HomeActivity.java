@@ -39,6 +39,25 @@ public class HomeActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         createDrawer();
+
+        if(!isChangingConfigurations()) {
+            //Loads the trending fragment on activity created
+            Fragment fragment = null;
+            Class fragmentClass = null;
+            FragmentManager fragmentManager = getSupportFragmentManager();
+
+            fragmentClass = TrendingFragment.class;
+            //Replace the fragment
+            try {
+                fragment = (Fragment) fragmentClass.newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
+
+            fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+        }
     }
 
     @Override
@@ -60,6 +79,7 @@ public class HomeActivity extends AppCompatActivity
         //Floating action button for play/pause
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         if(mediaService == null) {
+            Log.e("Media Service Null","Hiding FAB");
             fab.hide();
         } else {
             fab.show();
@@ -136,7 +156,7 @@ public class HomeActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        drawer.openDrawer(Gravity.LEFT);
+//        drawer.openDrawer(Gravity.LEFT);
     }
 
     @Override

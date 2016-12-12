@@ -12,6 +12,7 @@ import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import java.io.IOException;
@@ -62,17 +63,26 @@ public class MediaPlayerService extends Service
 
         //Creates a Notification to run this as a foreground service
         PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
-                new Intent(getApplicationContext(), MainActivity.class),
-                PendingIntent.FLAG_UPDATE_CURRENT); //This intent is to get the current status of this service for the notification. Not using it yet.
+                new Intent(getApplicationContext(), HomeActivity.class),
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
         Notification CrustNotification = new Notification.Builder(getApplicationContext())
-                .setContentTitle("PODCRUST PODCRUST PODCRUST")
-                .setContentText("podcrust podcrust podcrust")
-                .setSmallIcon(R.drawable.ic_play_button)
-                .addAction(R.drawable.ic_play_button,"Play",pi)
+                .setContentTitle("Podcrust")
+                .setContentText(source)
+                .setSmallIcon(R.mipmap.podcrust_logo)
+                .setAutoCancel(true)
+                .setContentIntent(pi)
+//                .addAction(R.drawable.ic_play_button,"Play",pi)
+
+                // Show controls on lock screen even when user hides sensitive content.
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                // Add media control buttons that invoke intents in your media service
+//                .addAction(R.mipmap.ic_pause, "Pause", pausePendingIntent)  // #1
+                // Apply the media style template
                 .build();
 
         startForeground(11, CrustNotification);
+
 
         //Initializes AudioManager, for handling audio focus
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
