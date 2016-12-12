@@ -20,6 +20,7 @@ import static trikita.anvil.BaseDSL.dip;
 import static trikita.anvil.BaseDSL.onTextChanged;
 import static trikita.anvil.BaseDSL.size;
 import static trikita.anvil.DSL.adapter;
+import static trikita.anvil.DSL.button;
 import static trikita.anvil.DSL.columnWidth;
 import static trikita.anvil.DSL.editText;
 import static trikita.anvil.DSL.gravity;
@@ -30,10 +31,12 @@ import static trikita.anvil.DSL.itemsCanFocus;
 import static trikita.anvil.DSL.linearLayout;
 import static trikita.anvil.DSL.listView;
 import static trikita.anvil.DSL.numColumns;
+import static trikita.anvil.DSL.onClick;
 import static trikita.anvil.DSL.onItemClick;
 import static trikita.anvil.DSL.orientation;
 import static trikita.anvil.DSL.stretchAllColumns;
 import static trikita.anvil.DSL.stretchMode;
+import static trikita.anvil.DSL.text;
 import static trikita.anvil.DSL.verticalSpacing;
 
 /**
@@ -47,6 +50,7 @@ public class SearchListView extends RenderableView {
     private final CharSequenceConsumer onTextChanged;
     private final SearchListView thiz;
     private Context context;
+    private CharSequence query;
 
     public interface CharSequenceConsumer {
         void cb(CharSequence s);
@@ -86,16 +90,17 @@ public class SearchListView extends RenderableView {
             orientation(LinearLayout.VERTICAL);
 
             editText(() -> {
-                onTextChanged(new BaseDSL.SimpleTextWatcher() {
-                    @Override
-                    public void onTextChanged(CharSequence s) {
-                        thiz.onTextChanged.cb(s);
-                    }
+                onTextChanged(s -> {
+                    query = s;
+                    thiz.onTextChanged.cb(s);
                 });
                 hint("Search for podcasts...");
             });
 
-            int asdf = 1324;
+            /*button(() -> {
+                onClick(v -> thiz.onTextChanged.cb(query));
+                text("Search");
+            });*/
 
             gridView(() -> {
                 size(MATCH, MATCH);

@@ -79,7 +79,7 @@ public class TrendListView extends RenderableView {
             gridView(() -> {
                 size(MATCH, MATCH);
                 itemsCanFocus(true);
-                margin(0,0,0,0);
+                margin(0,0,0,0 + 0);
                 padding(0,0,0,0);
                 onItemClick(onItemClickListener);
                 adapter(trendResultAdapter);

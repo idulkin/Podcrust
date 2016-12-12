@@ -72,18 +72,20 @@ public class SearchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        SearchListView.CharSequenceConsumer cb = s -> {
+            Log.d("SearchListActivity", "text changed to " + s);
+            updateSearchList(s.toString());
+        };
+
         Thread t = new Thread(() -> {
             final Audiosearch client = createClient();
             searchShowResult = getSearchShowResult(client);
-            SearchListView.CharSequenceConsumer cb = s -> {
-                Log.d("SearchListActivity", "text changed to " + s);
-                updateSearchList(s.toString());
-            };
-            searchListView = new SearchListView(getActivity().getBaseContext(), searchShowResult, cb);
+            //searchListView = new SearchListView(getActivity().getBaseContext(), searchShowResult, cb);
         });
         t.start();
         try {
             t.join();
+            searchListView = new SearchListView(getActivity().getBaseContext(), searchShowResult, cb);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -118,19 +120,24 @@ public class SearchFragment extends Fragment {
     }
 
     private void updateSearchList(String query) {
-        new Thread(() -> {
+        Thread t = new Thread(() -> {
             try {
+                int asdf = 3241;
                 Audiosearch client = QueryExecutor.createClient();
                 SearchShowResult searchShowResult2 = client.searchShows(query).execute().body();
                 searchShowResult.setResults(searchShowResult2.getResults());
-                searchListView.notifyDataSetChanged();
+                //searchListView.notifyDataSetChanged();
                 Log.d("SearchListActivity", "updateSearchList");
+                getActivity().runOnUiThread(() -> {
+                    searchListView.notifyDataSetChanged();
+                });
             }
             catch(Exception e) {
                 Log.d("SearchListActivity", e.toString());
                 e.printStackTrace();
             }
-        }).start();
+        });
+        t.start();
     }
 
     private Audiosearch createClient() {
