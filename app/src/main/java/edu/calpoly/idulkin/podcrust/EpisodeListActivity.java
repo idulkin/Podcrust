@@ -291,10 +291,15 @@ public class EpisodeListActivity extends AppCompatActivity implements EpisodeDet
 
                         switch (mediaService.getState()) {
                             case STOPPED:
-                                fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
-                                        R.mipmap.ic_pause));
+                                if(mp3 == null) {
+                                    Snackbar.make(view, "Choose an episode from Search", Snackbar.LENGTH_LONG)
+                                            .setAction("Action", null).show();
+                                }else {
+                                    fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                                            R.mipmap.ic_pause));
 
-                                mediaService.start();
+                                    mediaService.start();
+                                }
                                 break;
                             case PAUSED:
                                 mediaService.start();
