@@ -27,6 +27,7 @@ public class MediaPlayerService extends Service
 
     private static final String ACTION_PLAY = "com.example.action.PLAY";
     private String url = "http://soundbible.com/grab.php?id=1851&type=mp3";
+    private String source;
     private WifiManager.WifiLock wifiLock;
     private AudioManager audioManager;
     private String TAG = "Media Player Service";
@@ -133,6 +134,7 @@ public class MediaPlayerService extends Service
 
     public void setSource(String source){
         try{
+            this.source = source;
             mediaPlayer.setDataSource(source);
         }catch(IOException e){
             Log.e("Media Player Service:", "Failed to open media stream from URL");
@@ -140,6 +142,10 @@ public class MediaPlayerService extends Service
         mediaPlayer.prepareAsync(); // prepare async to not block main thread
 
         this.url = source;
+    }
+
+    public String getSource(){
+        return source;
     }
 
     @Override
