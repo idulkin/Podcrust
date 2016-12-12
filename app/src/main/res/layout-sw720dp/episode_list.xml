@@ -35,7 +35,16 @@
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="0.09"
+            android:paddingTop="8dp"
+            android:paddingLeft="16dp"
+            android:fontFamily="droid_sans"
+            android:textSize="20sp"
+            android:includeFontPadding="true"
+            android:gravity="left|top"
+            android:background="@color/colorPrimaryDark"
+            android:textColor="#ffffff"
             android:id="@+id/showTitle"/>
         <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
@@ -51,13 +60,13 @@
         android:layout_height="match_parent"
         android:layout_weight="3" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_gravity="center|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_media_play"/>
+    <!--<android.support.design.widget.FloatingActionButton-->
+        <!--android:id="@+id/fab"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_gravity="center|end"-->
+        <!--android:layout_margin="@dimen/fab_margin"-->
+        <!--android:src="@android:drawable/ic_media_play"/>-->
 
 
 </LinearLayout>
