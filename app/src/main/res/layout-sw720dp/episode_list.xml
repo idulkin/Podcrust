@@ -10,6 +10,8 @@
     android:divider="?android:attr/dividerHorizontal"
     android:orientation="horizontal"
     android:showDividers="middle"
+    android:theme="@style/AppTheme"
+    android:animateLayoutChanges="true"
     tools:context="edu.calpoly.idulkin.podcrust.EpisodeListActivity">
 
     <!--
