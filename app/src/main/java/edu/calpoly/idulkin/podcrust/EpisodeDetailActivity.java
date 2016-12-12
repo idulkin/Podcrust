@@ -102,19 +102,19 @@ public class EpisodeDetailActivity extends AppCompatActivity {
                             mediaService.start();
 
                             fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
-                                    R.mipmap.ic_pause_button));
+                                    R.mipmap.ic_pause));
                             break;
                         case PAUSED:
                             mediaService.start();
 
                             fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
-                                    R.mipmap.ic_pause_button));
+                                    R.mipmap.ic_pause));
                             break;
                         case PLAYING:
                             mediaService.pause();
 
                             fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
-                                    R.drawable.ic_play_button));
+                                    R.mipmap.ic_play));
                             break;
                     }
                 }

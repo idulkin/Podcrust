@@ -37,11 +37,6 @@ public class HomeActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        //Bind to the media player service
-        Intent intent = new Intent(this, MediaPlayerService.class);
-        startService(intent);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        bound = true;
 
         createDrawer();
     }
@@ -49,6 +44,71 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onStart(){
         super.onStart();
+
+        //Bind to the media player service
+        Intent intent = new Intent(this, MediaPlayerService.class);
+        startService(intent);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        bound = true;
+
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        //Floating action button for play/pause
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        if(mediaService == null) {
+            fab.hide();
+        } else {
+            fab.show();
+                switch (mediaService.getState()) {
+                    case STOPPED:
+                        fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                                R.mipmap.ic_play));
+                        break;
+                    case PAUSED:
+                        fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                                R.mipmap.ic_play));
+                        break;
+                    case PLAYING:
+                        fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                                R.mipmap.ic_pause));
+                        break;
+                }
+            }
+        if(bound) {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    Log.e("Home Activity FAB click", "MP State:" + mediaService.getState());
+
+                    switch (mediaService.getState()) {
+                        case STOPPED:
+                            Snackbar.make(view, "Choose an episode from Search", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
+
+                            break;
+                        case PAUSED:
+                            mediaService.start();
+
+                            fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                                    R.mipmap.ic_pause));
+                            break;
+                        case PLAYING:
+                            mediaService.pause();
+
+                            fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                                    R.mipmap.ic_play));
+                            break;
+                    }
+                }
+
+
+            });
+        }
     }
 
     @Override
@@ -66,51 +126,6 @@ public class HomeActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        switch(mediaService.getState()){
-//            case STOPPED:
-//                //Stopped icon
-//                break;
-//            case PAUSED:
-//                fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
-//                        R.drawable.ic_play_button));
-//                break;
-//            case PLAYING:
-//                fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
-//                        R.mipmap.ic_pause_button));
-//                break;
-//        }
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(bound) {
-                    Log.e("Home Activity FAB click", "MP State:" + mediaService.getState());
-
-                    switch (mediaService.getState()) {
-                        case STOPPED:
-                            Snackbar.make(view, "Choose an episode from Search", Snackbar.LENGTH_LONG)
-                                    .setAction("Action", null).show();
-
-                            break;
-                        case PAUSED:
-                            mediaService.start();
-
-                            fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
-                                    R.mipmap.ic_pause_button));
-                            break;
-                        case PLAYING:
-                            mediaService.pause();
-
-                            fab.setImageBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
-                                    R.drawable.ic_play_button));
-                            break;
-                    }
-                }
-            }
-
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -168,6 +183,7 @@ public class HomeActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        //Nav Drawer Search
         if (id == R.id.nav_search) {
             fragmentClass = SearchFragment.class;
             //Replace the fragment
@@ -178,10 +194,7 @@ public class HomeActivity extends AppCompatActivity
             }
             fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
 
-        } else if (id == R.id.nav_favorites) {
-            Intent intent = new Intent(context, FavoritesActivity.class);
-            context.startActivity(intent);
-
+            //Nav Bar Trending
         } else if (id == R.id.nav_trending) {
             fragmentClass = TrendingFragment.class;
             //Replace the fragment
@@ -190,16 +203,18 @@ public class HomeActivity extends AppCompatActivity
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
+
             fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
 
-        } else if (id == R.id.nav_settings) {
-
+        //Nav Bar Share
         } else if (id == R.id.nav_share) {
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
 
-        } else if (id == R.id.nav_send) {
-
+            sharePodcast();
         }
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -223,4 +238,20 @@ public class HomeActivity extends AppCompatActivity
             bound = false;
         }
     };
+
+
+    //Share the podcast currently in the Media Player Service. If null, displays a toast.
+    private void sharePodcast(){
+
+        if(mediaService == null){
+            Snackbar.make(findViewById(R.id.fab),"Share the podcast you're listening to", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+        }
+
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, mediaService.getSource());
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, "Send with..."));
+    }
 }
