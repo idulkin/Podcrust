@@ -67,8 +67,8 @@ public class TrendResultAdapter extends BaseAdapter {
                     ImageUrls imageUrls = getCount() > i ? getItem(i).getRelatedEpisodes().get(0).getImageUrls(): null;
                     if (imageUrls.getFull() != null && !imageUrls.getFull().equals("")) {
                         imageView(() -> {
-                            margin(0,0,0,0);
                             padding(0,0,0,0);
+                            margin(30,0,30,0);
 
                             size(WRAP, WRAP);
                             init(() -> {
