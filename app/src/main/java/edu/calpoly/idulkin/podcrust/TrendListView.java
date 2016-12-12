@@ -1,7 +1,9 @@
 package edu.calpoly.idulkin.podcrust;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -13,8 +15,11 @@ import audiosearch.model.TrendResult;
 import trikita.anvil.RenderableView;
 
 import static trikita.anvil.BaseDSL.MATCH;
+import static trikita.anvil.BaseDSL.margin;
+import static trikita.anvil.BaseDSL.padding;
 import static trikita.anvil.BaseDSL.size;
 import static trikita.anvil.DSL.adapter;
+import static trikita.anvil.DSL.columnWidth;
 import static trikita.anvil.DSL.gridView;
 import static trikita.anvil.DSL.horizontalSpacing;
 import static trikita.anvil.DSL.itemsCanFocus;
@@ -60,6 +65,13 @@ public class TrendListView extends RenderableView {
     public void view() {
         trendResultAdapter.notifyDataSetChanged();
 
+        /*DisplayMetrics displayMetrics = new DisplayMetrics();
+        (/*(Activity) getContext())
+                .getWindowManager()
+                .getDefaultDisplay()
+                .getMetrics(displayMetrics);
+        int screenWidth = displayMetrics.widthPixels;*/
+
         linearLayout(() -> {
             size(MATCH, MATCH);
             orientation(LinearLayout.VERTICAL);
@@ -67,10 +79,14 @@ public class TrendListView extends RenderableView {
             gridView(() -> {
                 size(MATCH, MATCH);
                 itemsCanFocus(true);
+                margin(0,0,0,0);
+                padding(0,0,0,0);
                 onItemClick(onItemClickListener);
                 adapter(trendResultAdapter);
-                horizontalSpacing(0);
+                //horizontalSpacing(0);
                 numColumns(3);
+                //columnWidth(screenWidth / 3);
+
             });
         });
     }

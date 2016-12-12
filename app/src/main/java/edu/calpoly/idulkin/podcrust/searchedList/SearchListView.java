@@ -32,6 +32,7 @@ import static trikita.anvil.DSL.listView;
 import static trikita.anvil.DSL.numColumns;
 import static trikita.anvil.DSL.onItemClick;
 import static trikita.anvil.DSL.orientation;
+import static trikita.anvil.DSL.stretchAllColumns;
 import static trikita.anvil.DSL.stretchMode;
 import static trikita.anvil.DSL.verticalSpacing;
 
@@ -106,6 +107,7 @@ public class SearchListView extends RenderableView {
                 //horizontalSpacing(dip(10));
                 horizontalSpacing(0);
                 numColumns(3);
+                stretchAllColumns(true);
 
                 //gravity(CENTER);
                 /*android:columnWidth="90dp"

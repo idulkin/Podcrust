@@ -26,6 +26,7 @@ import static trikita.anvil.BaseDSL.MATCH;
 import static trikita.anvil.BaseDSL.WRAP;
 import static trikita.anvil.BaseDSL.init;
 import static trikita.anvil.BaseDSL.margin;
+import static trikita.anvil.BaseDSL.padding;
 import static trikita.anvil.BaseDSL.size;
 import static trikita.anvil.DSL.imageView;
 import static trikita.anvil.DSL.linearLayout;
@@ -67,6 +68,7 @@ public class TrendResultAdapter extends BaseAdapter {
                     if (imageUrls.getFull() != null && !imageUrls.getFull().equals("")) {
                         imageView(() -> {
                             margin(0,0,0,0);
+                            padding(0,0,0,0);
 
                             size(WRAP, WRAP);
                             init(() -> {
