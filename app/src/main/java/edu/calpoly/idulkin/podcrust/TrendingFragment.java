@@ -62,66 +62,27 @@ public class TrendingFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        new Thread(new Runnable() {
-            Audiosearch createClient() {
-                Log.d("createClient", "trying...");
-                try {
-                    Audiosearch result = QueryExecutor.createClient();
-                    return result;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e1) {
-                    } finally {
-                        return createClient();
-                    }
+
+        Thread t = new Thread(() -> {
+            client = createClient();
+            Log.d("Search result", "client created");
+            trendResults = getTrendingResult(client);
+            Log.d("Search result", trendResults.toString());
+
+            try {
+                for (TrendResult r : trendResults) {
+                    Log.d("searchresult", r.getRelatedEpisodes().get(0).getShowTitle());
                 }
+
+                trendListView = new TrendListView(getActivity().getBaseContext(), trendResults);
+
+            } catch (Exception e) {
+                Log.d("trend list", e.getMessage());
             }
-
-            List<TrendResult> getTrendingResult() {
-                Log.d("getTrendShowResult", "trying...");
-                try {
-                    return client.getTrending().execute().body();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e1) {
-                    } finally {
-                        return getTrendingResult();
-                    }
-                }
-            }
-
-
-            @Override
-            public void run() {
-                client = createClient();
-                Log.d("Search result", "client created");
-                trendResults = getTrendingResult();
-                Log.d("Search result", trendResults.toString());
-
-                try {
-                    for (TrendResult r : trendResults) {
-                        Log.d("searchresult", r.getRelatedEpisodes().get(0).getShowTitle());
-                    }
-
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            trendListView = new TrendListView(getActivity().getBaseContext(), trendResults);
-                            getActivity().setContentView(trendListView);
-                        }
-                    });
-
-                } catch (Exception e) {
-                    Log.d("trend list", e.getMessage());
-                    this.run();
-                }
-            }
-
-        }).start();
+        });
+        t.start();
+        try {t.join();}
+        catch(Exception e) {}
 
         return trendListView;
     }
@@ -150,5 +111,36 @@ public class TrendingFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    Audiosearch createClient() {
+        Log.d("createClient", "trying...");
+        try {
+            Audiosearch result = QueryExecutor.createClient();
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e1) {
+            } finally {
+                return createClient();
+            }
+        }
+    }
+
+    List<TrendResult> getTrendingResult(Audiosearch client) {
+        Log.d("getTrendShowResult", "trying...");
+        try {
+            return client.getTrending().execute().body();
+        } catch (IOException e) {
+            e.printStackTrace();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e1) {
+            } finally {
+                return getTrendingResult(client);
+            }
+        }
     }
 }

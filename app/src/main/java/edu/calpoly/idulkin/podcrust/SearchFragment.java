@@ -120,6 +120,7 @@ public class SearchFragment extends Fragment {
     private void updateSearchList(String query) {
         new Thread(() -> {
             try {
+                Audiosearch client = QueryExecutor.createClient();
                 SearchShowResult searchShowResult2 = client.searchShows(query).execute().body();
                 searchShowResult.setResults(searchShowResult2.getResults());
                 searchListView.notifyDataSetChanged();
@@ -127,6 +128,7 @@ public class SearchFragment extends Fragment {
             }
             catch(Exception e) {
                 Log.d("SearchListActivity", e.toString());
+                e.printStackTrace();
             }
         }).start();
     }
