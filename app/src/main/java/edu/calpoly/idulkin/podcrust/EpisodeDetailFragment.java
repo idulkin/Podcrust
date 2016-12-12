@@ -1,11 +1,21 @@
 package edu.calpoly.idulkin.podcrust;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -50,25 +60,97 @@ public class EpisodeDetailFragment extends ContractFragment<EpisodeDetailFragmen
         return  edf;
     }
 
+
+    private static final String TAG = "EpisodeDetailActivity";
+    private MediaPlayerService mediaService;
+    private boolean bound = false;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //setContentView(R.layout.activity_episode_detail);
+        //Bundle bundle = getIntent().getExtras();
 
-//        if (getArguments().containsKey(ARG_ITEM_ID)) {
-//            // Load the dummy content specified by the fragment
-//            // arguments. In a real-world scenario, use a Loader
-//            // to load content from a content provider.
-//            mItem = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
-//
-//            Activity activity = this.getActivity();
-//            CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
-//            if (appBarLayout != null) {
-//                appBarLayout.setTitle(mItem.content);
-//            }
-//        }
+        //title = bundle.getString("TITLE");
+        //mp3 = bundle.getString("MP3");
+        //description = bundle.getString("DESCRIPTION");
+        //img = bundle.getString("IMAGE");
 
+
+        //Floating action button plays the podcast
+        FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(bound) {
+                    Log.e("FAB click", "MP State:" + mediaService.getState());
+
+                    switch (mediaService.getState()) {
+                        case STOPPED:
+                            mediaService.setSource(mp3);
+                            mediaService.start();
+
+                            fab.setImageBitmap(BitmapFactory.decodeResource(getActivity().getApplicationContext().getResources(),
+                                    R.mipmap.ic_pause));
+                            break;
+                        case PAUSED:
+                            mediaService.start();
+
+                            fab.setImageBitmap(BitmapFactory.decodeResource(getActivity().getApplicationContext().getResources(),
+                                    R.mipmap.ic_pause));
+                            break;
+                        case PLAYING:
+                            mediaService.pause();
+
+                            fab.setImageBitmap(BitmapFactory.decodeResource(getActivity().getApplicationContext().getResources(),
+                                    R.mipmap.ic_play));
+                            break;
+                    }
+                }
+            }
+        });
 
     }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+
+        //Bind to the media player service
+        Intent intent = new Intent(getActivity().getApplicationContext(), MediaPlayerService.class);
+//        intent.putExtra("MP3", mp3);
+        getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        bound = true;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        // Unbind from the service
+        if (bound) {
+            getActivity().unbindService(mConnection);
+            bound = false;
+        }
+    }
+
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            MediaPlayerService.LocalBinder binder = (MediaPlayerService.LocalBinder) service;
+            mediaService = binder.getService();
+            bound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            bound = false;
+        }
+    };
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
