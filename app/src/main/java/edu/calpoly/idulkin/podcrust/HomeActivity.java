@@ -142,7 +142,10 @@ public class HomeActivity extends AppCompatActivity
     @Override
     protected void onDestroy(){
         if(!isChangingConfigurations())
+            mediaService.stop();
+
             mediaService.stopForeground(true);
+            mediaService.onDestroy();
     }
 
     protected void createDrawer() {
