@@ -10,7 +10,7 @@
         android:icon="@mipmap/podcrust_logo"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        android:theme="@style/AppTheme">
         <activity android:name=".MainActivity" />
         <activity android:name=".searchedList.SearchListActivity"/>
         <activity android:name=".PlayPodcastActivity" />
@@ -19,28 +19,24 @@
 
         <activity
             android:name=".EpisodeListActivity"
-            android:label="@string/title_episode_list"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            android:label="@string/title_episode_list">
         </activity>
         <activity
             android:name=".EpisodeDetailActivity"
             android:label="@string/title_episode_detail"
-            android:parentActivityName=".EpisodeListActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            android:parentActivityName=".EpisodeListActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="edu.calpoly.idulkin.podcrust.EpisodeListActivity" />
         </activity>
         <activity
             android:name=".FavoritesActivity"
-            android:label="Favorites"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            android:label="Favorites">
         </activity>
         <activity
             android:name=".HomeActivity"
             android:label="Podcrust"
-            android:launchMode="singleInstance"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
