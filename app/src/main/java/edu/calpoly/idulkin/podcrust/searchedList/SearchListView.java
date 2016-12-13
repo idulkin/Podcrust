@@ -2,6 +2,7 @@ package edu.calpoly.idulkin.podcrust.searchedList;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.icu.text.MeasureFormat;
 import android.util.Log;
 import android.view.View;
@@ -37,6 +38,7 @@ import static trikita.anvil.DSL.orientation;
 import static trikita.anvil.DSL.stretchAllColumns;
 import static trikita.anvil.DSL.stretchMode;
 import static trikita.anvil.DSL.text;
+import static trikita.anvil.DSL.textColor;
 import static trikita.anvil.DSL.verticalSpacing;
 
 /**
@@ -95,6 +97,7 @@ public class SearchListView extends RenderableView {
                     thiz.onTextChanged.cb(s);
                 });
                 hint("Search for podcasts...");
+                textColor(Color.BLACK);
             });
 
             /*button(() -> {
